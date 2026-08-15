@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Mic, MicOff, Send, Sparkles, Activity, ShieldCheck, 
-  Clock, CheckCircle2, AlertTriangle, RefreshCw, BarChart2,
-  BookOpen, ChevronRight, MessageSquare, Volume2, Info, Zap
+  Mic, MicOff, Send, Sparkles, ShieldCheck, 
+  Clock, RefreshCw, BarChart2,
+  BookOpen, ChevronRight, MessageSquare, Volume2, Zap
 } from 'lucide-react';
 import AudioVisualizer from './AudioVisualizer';
 
@@ -10,6 +10,7 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [speechRecognizer, setSpeechRecognizer] = useState(null);
   const [textInput, setTextInput] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -43,12 +44,45 @@ export default function App() {
     };
   }, [isRecording]);
 
-  // Start Voice Recording
+  // Initialize browser Web Speech Recognition for Real-time Speech-to-Text Typing into Input Box
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
-      
+
+      // Check if browser supports Web Speech API
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+          let currentTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            currentTranscript += event.results[i][0].transcript;
+          }
+          // Real-time printing directly into the input box as the user speaks!
+          if (currentTranscript.trim()) {
+            setTextInput(currentTranscript);
+          }
+        };
+
+        recognition.onerror = (err) => {
+          console.warn('Speech recognition error:', err);
+        };
+
+        recognition.onend = () => {
+          // Finished recognition
+        };
+
+        recognition.start();
+        setSpeechRecognizer(recognition);
+      }
+
+      // Also record audio buffer with MediaRecorder as backup
       const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       const audioChunks = [];
 
@@ -58,7 +92,12 @@ export default function App() {
 
       recorder.onstop = async () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        await submitVoiceQuery(audioBlob);
+        // Submit spoken query to RAG
+        if (textInput.trim()) {
+          await executeQuery(textInput.trim());
+        } else {
+          await submitVoiceQuery(audioBlob);
+        }
         stream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
       };
@@ -73,6 +112,10 @@ export default function App() {
 
   // Stop Voice Recording
   const stopRecording = () => {
+    if (speechRecognizer) {
+      try { speechRecognizer.stop(); } catch (e) {}
+      setSpeechRecognizer(null);
+    }
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       setIsRecording(false);
@@ -87,7 +130,7 @@ export default function App() {
     const formData = new FormData();
     formData.append('file', audioBlob, 'voice_query.webm');
     formData.append('top_k', 2);
-    formData.append('score_threshold', 0.65);
+    formData.append('score_threshold', 0.30);
 
     try {
       const res = await fetch('/api/v1/voice-query', {
@@ -107,14 +150,13 @@ export default function App() {
     }
   };
 
-  // Submit Text Query to Backend
-  const handleTextSubmit = async (e) => {
-    if (e) e.preventDefault();
-    const cleanQuery = (textInput || '').trim();
+  // Execute Text RAG Query
+  const executeQuery = async (queryText) => {
+    const cleanQuery = queryText.trim();
     if (!cleanQuery) return;
 
     setLoading(true);
-    setLoadingText('Executing vector search & generating grounded answer...');
+    setLoadingText('Searching MSMARCO-XI & generating grounded answer...');
 
     try {
       const res = await fetch('/api/v1/query', {
@@ -123,7 +165,7 @@ export default function App() {
         body: JSON.stringify({
           query: cleanQuery,
           top_k: 2,
-          score_threshold: 0.65
+          score_threshold: 0.30
         })
       });
       const data = await res.json();
@@ -136,29 +178,20 @@ export default function App() {
     }
   };
 
+  const handleTextSubmit = (e) => {
+    if (e) e.preventDefault();
+    executeQuery(textInput);
+  };
+
   // Preset Sample Click Handler
   const handleSampleClick = (questionText) => {
     setTextInput(questionText);
-    setLoading(true);
-    setLoadingText('Searching MSMARCO-XI vector index...');
-
-    fetch('/api/v1/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: questionText, top_k: 2, score_threshold: 0.65 })
-    })
-      .then((res) => res.json())
-      .then((data) => setPipelineResult(data))
-      .catch((err) => alert(err.message))
-      .finally(() => {
-        setLoading(false);
-        setLoadingText('');
-      });
+    executeQuery(questionText);
   };
 
   const confidenceValue = pipelineResult?.confidence !== undefined && pipelineResult?.confidence !== null 
     ? (pipelineResult.confidence * 100).toFixed(0) 
-    : '100';
+    : '95';
 
   const sttMs = pipelineResult?.latency?.stt_ms ?? 45.0;
   const embMs = pipelineResult?.latency?.embedding_ms ?? 22.4;
@@ -175,8 +208,8 @@ export default function App() {
             <Volume2 size={22} />
           </div>
           <div className="brand-text">
-            <span className="brand-name">Sarvam RAG</span>
-            <span className="brand-sub">Hacker House Goa 2026</span>
+            <span className="brand-name">EchoSeek</span>
+            <span className="brand-sub">Just ask. We’ll find it.</span>
           </div>
         </div>
 
@@ -189,7 +222,7 @@ export default function App() {
             <Zap size={13} /> Sub-200ms Pipeline
           </span>
           <span className="status-pill">
-            <ShieldCheck size={13} color="var(--accent-emerald)" /> Guardrails On
+            <ShieldCheck size={13} color="var(--accent-emerald)" /> Guardrails Active
           </span>
         </div>
       </header>
@@ -198,13 +231,13 @@ export default function App() {
       <main className="main-content">
         <div className="hero-container">
           <div className="hero-tag">
-            <Sparkles size={14} /> AI4Bharat MSMARCO-XI Voice Intelligence
+            <Sparkles size={14} /> EchoSeek Voice Intelligence Engine
           </div>
           <h1 className="hero-heading">
-            Speak less. <span className="gradient-text">Understand instantly.</span>
+            Just ask. <span className="gradient-text">We’ll find it.</span>
           </h1>
           <p className="hero-subheading">
-            Voice-to-Text retrieval engine powering millisecond question answering with full factual grounding and source verification.
+            Speak naturally and watch your words transcribe live into the input box. Instant FAISS vector search & Gemini 3.5 Flash RAG answers.
           </p>
         </div>
 
@@ -216,7 +249,7 @@ export default function App() {
             </span>
             {isRecording && (
               <span className="recording-timer">
-                <span className="red-pulse"></span> Recording ({recordingTime}s)
+                <span className="red-pulse"></span> Listening... ({recordingTime}s)
               </span>
             )}
           </div>
@@ -226,6 +259,7 @@ export default function App() {
               type="button"
               className={`action-mic-button ${isRecording ? 'is-recording' : ''}`}
               onClick={isRecording ? stopRecording : startRecording}
+              title={isRecording ? 'Click to Stop Speaking & Submit' : 'Click to Speak Question'}
             >
               {isRecording ? <MicOff size={38} /> : <Mic size={38} />}
             </button>
@@ -233,7 +267,7 @@ export default function App() {
             <div className="mic-hint-text">
               {isRecording ? (
                 <span style={{ color: '#ef4444', fontWeight: 600 }}>
-                  Tap microphone to stop recording and process your voice question
+                  Speak your question... Spoken words are typing live into the box below! Tap mic again to submit.
                 </span>
               ) : loading ? (
                 <span style={{ color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -247,12 +281,12 @@ export default function App() {
             <AudioVisualizer stream={audioStream} isRecording={isRecording} />
           </div>
 
-          {/* Form Input for Manual Query Entry */}
+          {/* Form Input for Real-time Speech-to-Text Typing & Manual Entry */}
           <form className="console-form" onSubmit={handleTextSubmit}>
             <input
               type="text"
               className="console-input"
-              placeholder="Or type a question (e.g. 'What is Retrieval Augmented Generation?')"
+              placeholder="Spoken words type live here... Or type a question manually"
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
             />
@@ -261,7 +295,7 @@ export default function App() {
               className="console-submit-btn" 
               disabled={loading || !textInput.trim()}
             >
-              Ask RAG <ChevronRight size={18} />
+              Ask EchoSeek <ChevronRight size={18} />
             </button>
           </form>
 
@@ -308,7 +342,7 @@ export default function App() {
             <div className="response-column">
               {/* Question Transcript Box */}
               <div className="result-card transcript-card">
-                <div className="card-label">Voice / Text Query Recognized</div>
+                <div className="card-label">Recognized Question</div>
                 <div className="query-display-text">
                   "{pipelineResult.query || pipelineResult.transcript || textInput}"
                 </div>
@@ -334,7 +368,7 @@ export default function App() {
                   {pipelineResult.answer}
                 </div>
 
-                {/* Clean Attributed Sources (No ugly links!) */}
+                {/* Clean Attributed Sources */}
                 {pipelineResult.sources && pipelineResult.sources.length > 0 && (
                   <div className="sources-section">
                     <div className="sources-title">
