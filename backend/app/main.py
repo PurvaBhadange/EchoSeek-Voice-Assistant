@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.pipeline import router as pipeline_router
+from app.api.pipeline import router as pipeline_router, pipeline_services
+from app.core.optimizer import LatencyOptimizer
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -20,6 +21,14 @@ app.add_middleware(
 
 # Register Pipeline Router
 app.include_router(pipeline_router)
+
+@app.on_event("startup")
+async def startup_prewarm_event():
+    print("[*] FastAPI Server Startup: Pre-warming models & loading FAISS index...")
+    pipeline_services.initialize()
+    optimizer = LatencyOptimizer(pipeline_services.embedding_engine)
+    optimizer.prewarm()
+    print("[+] FastAPI Server ready for sub-200ms requests!")
 
 @app.get("/")
 async def root():
