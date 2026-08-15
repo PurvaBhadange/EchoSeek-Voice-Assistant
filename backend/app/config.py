@@ -1,4 +1,5 @@
 import os
+from typing import List, Union, Any
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     HOST: str = os.getenv("HOST", "0.0.0.0")
     
     # CORS Origins
-    CORS_ORIGINS: list = [
+    CORS_ORIGINS: Any = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
