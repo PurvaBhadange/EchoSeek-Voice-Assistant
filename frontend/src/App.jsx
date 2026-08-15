@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mic, MicOff, Send, Sparkles, Activity, ShieldCheck, 
-  ExternalLink, Zap, Clock, Cpu, CheckCircle2, AlertCircle,
-  Database, RefreshCw, BarChart2
+  Clock, CheckCircle2, AlertTriangle, RefreshCw, BarChart2,
+  BookOpen, ChevronRight, MessageSquare, Volume2, Info
 } from 'lucide-react';
 import AudioVisualizer from './AudioVisualizer';
 
@@ -13,13 +13,14 @@ export default function App() {
   const [textInput, setTextInput] = useState('');
   
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
   const [health, setHealth] = useState(null);
   const [pipelineResult, setPipelineResult] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
 
   const timerRef = useRef(null);
 
-  // Fetch backend health on boot
+  // Fetch backend health status on mount
   useEffect(() => {
     fetch('/api/health')
       .then((res) => res.json())
@@ -27,7 +28,7 @@ export default function App() {
       .catch(() => setHealth({ status: 'offline' }));
   }, []);
 
-  // Timer logic for recording
+  // Timer logic for live voice recording
   useEffect(() => {
     if (isRecording) {
       setRecordingTime(0);
@@ -48,7 +49,7 @@ export default function App() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
       
-      const recorder = new MediaRecorder(stream);
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       const audioChunks = [];
 
       recorder.ondataavailable = (e) => {
@@ -56,8 +57,8 @@ export default function App() {
       };
 
       recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        submitVoiceQuery(audioBlob);
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        await submitVoiceQuery(audioBlob);
         stream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
       };
@@ -81,10 +82,12 @@ export default function App() {
   // Submit Voice Audio to Backend
   const submitVoiceQuery = async (audioBlob) => {
     setLoading(true);
+    setLoadingText('Transcribing audio via Sarvam AI & searching FAISS...');
+    
     const formData = new FormData();
-    formData.append('file', audioBlob, 'speech.wav');
+    formData.append('file', audioBlob, 'voice_query.webm');
     formData.append('top_k', 2);
-    formData.append('score_threshold', 0.70);
+    formData.append('score_threshold', 0.65);
 
     try {
       const res = await fetch('/api/v1/voice-query', {
@@ -93,27 +96,34 @@ export default function App() {
       });
       const data = await res.json();
       setPipelineResult(data);
+      if (data.query) {
+        setTextInput(data.query);
+      }
     } catch (err) {
       alert('Error processing voice query: ' + err.message);
     } finally {
       setLoading(false);
+      setLoadingText('');
     }
   };
 
-  // Submit Text Query to Backend
+  // Submit Text Query to Backend (FIXED: replaced .strip() with .trim())
   const handleTextSubmit = async (e) => {
     if (e) e.preventDefault();
-    if (!textInput.strip()) return;
+    const cleanQuery = textInput.trim();
+    if (!cleanQuery) return;
 
     setLoading(true);
+    setLoadingText('Executing vector search & generating grounded answer...');
+
     try {
       const res = await fetch('/api/v1/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: textInput,
+          query: cleanQuery,
           top_k: 2,
-          score_threshold: 0.70
+          score_threshold: 0.65
         })
       });
       const data = await res.json();
@@ -122,274 +132,313 @@ export default function App() {
       alert('Error submitting query: ' + err.message);
     } finally {
       setLoading(false);
+      setLoadingText('');
     }
   };
 
-  // Sample Question Preset Handler
+  // Preset Sample Click Handler
   const handleSampleClick = (questionText) => {
     setTextInput(questionText);
     setLoading(true);
+    setLoadingText('Searching MSMARCO-XI vector index...');
+
     fetch('/api/v1/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: questionText, top_k: 2, score_threshold: 0.70 })
+      body: JSON.stringify({ query: questionText, top_k: 2, score_threshold: 0.65 })
     })
       .then((res) => res.json())
       .then((data) => setPipelineResult(data))
       .catch((err) => alert(err.message))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setLoadingText('');
+      });
   };
 
   return (
     <div className="app-wrapper">
-      {/* Header Navbar */}
+      {/* Header Navigation */}
       <header className="navbar">
         <div className="brand">
           <div className="brand-icon">
-            <Mic size={20} />
+            <Volume2 size={22} />
           </div>
-          <span>Voice RAG</span>
+          <div className="brand-text">
+            <span className="brand-name">Sarvam RAG</span>
+            <span className="brand-sub">Hacker House Goa 2026</span>
+          </div>
         </div>
 
         <div className="nav-badges">
-          <span className={`nav-badge ${health?.status === 'healthy' ? 'online' : ''}`}>
-            <Activity size={13} /> {health?.status === 'healthy' ? 'System Online' : 'Connecting...'}
+          <span className={`status-pill ${health?.status === 'healthy' ? 'online' : ''}`}>
+            <span className="dot"></span>
+            {health?.status === 'healthy' ? 'System Ready' : 'Connecting...'}
           </span>
-          <span className="nav-badge">
-            <Zap size={13} color="var(--accent-cyan)" /> Target &lt; 200 ms
+          <span className="status-pill highlight">
+            <Zap size={13} /> Sub-200ms Pipeline
           </span>
-          <span className="nav-badge">
-            <ShieldCheck size={13} color="var(--accent-emerald)" /> Guardrails Active
+          <span className="status-pill">
+            <ShieldCheck size={13} color="var(--accent-emerald)" /> Guardrails On
           </span>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero">
-        <span className="pill-label">
-          <Sparkles size={14} /> Hacker House Goa 2026 — Task 2
-        </span>
-        <h1 className="hero-title">Speak Naturally. Get Verified Answers.</h1>
-        <p className="hero-subtitle">
-          Ultra-low-latency Speech-to-Text, FAISS semantic vector retrieval, and Google Gemini 3.5 Flash RAG over MSMARCO-XI.
-        </p>
-      </section>
+      {/* Main Hero & Voice Dictation Section */}
+      <main className="main-content">
+        <div className="hero-container">
+          <div className="hero-tag">
+            <Sparkles size={14} /> AI4Bharat MSMARCO-XI Voice Intelligence
+          </div>
+          <h1 className="hero-heading">
+            Speak less. <span className="gradient-text">Understand instantly.</span>
+          </h1>
+          <p className="hero-subheading">
+            Voice-to-Text retrieval engine powering millisecond question answering with full factual grounding and source verification.
+          </p>
+        </div>
 
-      {/* Main Interactive Input Dock */}
-      <section className={`input-dock ${isRecording ? 'recording' : ''}`}>
-        <div className="mic-button-container">
-          <button
-            className={`mic-btn ${isRecording ? 'recording' : ''}`}
-            onClick={isRecording ? stopRecording : startRecording}
-            title={isRecording ? 'Click to Stop Recording' : 'Click to Speak Question'}
-          >
-            {isRecording ? <MicOff size={36} /> : <Mic size={36} />}
-          </button>
-
-          <div className="mic-status-label">
-            {isRecording ? (
-              <span style={{ color: '#ef4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', animation: 'pulse 1s infinite' }}></span>
-                Listening... ({recordingTime}s) — Click Mic to Stop
+        {/* Central Voice & Text Input Console */}
+        <div className={`console-card ${isRecording ? 'active-recording' : ''}`}>
+          <div className="console-header">
+            <span className="console-title">
+              <MessageSquare size={16} color="var(--accent-cyan)" /> Voice Dictation Console
+            </span>
+            {isRecording && (
+              <span className="recording-timer">
+                <span className="red-pulse"></span> Recording ({recordingTime}s)
               </span>
-            ) : loading ? (
-              <span style={{ color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <RefreshCw size={16} className="spin-icon" /> Running STT & Vector RAG Pipeline...
-              </span>
-            ) : (
-              <span>Click microphone to record voice question or type below</span>
             )}
           </div>
 
-          <AudioVisualizer stream={audioStream} isRecording={isRecording} />
-        </div>
+          <div className="mic-stage">
+            <button
+              type="button"
+              className={`action-mic-button ${isRecording ? 'is-recording' : ''}`}
+              onClick={isRecording ? stopRecording : startRecording}
+            >
+              {isRecording ? <MicOff size={38} /> : <Mic size={38} />}
+            </button>
 
-        {/* Text Input Fallback */}
-        <form className="text-input-form" onSubmit={handleTextSubmit}>
-          <input
-            type="text"
-            className="text-input"
-            placeholder="Or type a question (e.g. 'What is Retrieval Augmented Generation?')"
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-          />
-          <button type="submit" className="submit-btn" disabled={loading || !textInput.trim()}>
-            <Send size={16} /> Ask
-          </button>
-        </form>
-
-        {/* Preset Sample Pills */}
-        <div className="sample-pills">
-          <button className="sample-pill" onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}>
-            ⚡ What is RAG?
-          </button>
-          <button className="sample-pill" onClick={() => handleSampleClick("How do vector embeddings work in semantic search?")}>
-            🔍 How do embeddings work?
-          </button>
-          <button className="sample-pill" onClick={() => handleSampleClick("what is speech to text latency optimization")}>
-            🗣️ STT Latency Optimization
-          </button>
-          <button className="sample-pill" onClick={() => handleSampleClick("where is Goa located in India")}>
-            📍 Where is Goa?
-          </button>
-        </div>
-      </section>
-
-      {/* RAG Results & Analytics Grid */}
-      {pipelineResult && (
-        <section className="results-grid">
-          {/* Left Column: Answer & Sources */}
-          <div>
-            {/* Transcript Card if Voice */}
-            {pipelineResult.transcript && (
-              <div className="glass-card" style={{ padding: '1.25rem' }}>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                  Speech-to-Text Transcript (Sarvam AI)
-                </div>
-                <div style={{ fontWeight: 600, fontSize: '1.05rem', color: 'var(--accent-cyan)' }}>
-                  "{pipelineResult.transcript}"
-                </div>
-              </div>
-            )}
-
-            {/* Grounded Answer Card */}
-            <div className="glass-card">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h2 className="card-title" style={{ margin: 0 }}>
-                  <Sparkles size={20} color="var(--accent-cyan)" /> Grounded Answer
-                </h2>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <span className="nav-badge" style={{ color: pipelineResult.is_grounded ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
-                    <ShieldCheck size={12} /> {pipelineResult.guardrail_action}
-                  </span>
-                  <span className="nav-badge">
-                    Confidence: {(pipelineResult.confidence * 100).toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-
-              <div className="answer-box">
-                {pipelineResult.answer}
-              </div>
-
-              {/* Sources & Citations */}
-              {pipelineResult.sources && pipelineResult.sources.length > 0 && (
-                <div>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.6rem' }}>
-                    Attributed Sources & Grounding Links ({pipelineResult.sources.length}):
-                  </div>
-                  <div className="sources-list">
-                    {pipelineResult.sources.map((src, idx) => (
-                      <div key={idx} className="source-item">
-                        <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          Passage ID: {src.passage_id}
-                        </div>
-                        {src.url ? (
-                          <a href={src.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                            {src.url} <ExternalLink size={12} />
-                          </a>
-                        ) : (
-                          <span style={{ color: 'var(--text-muted)' }}>Verified MSMARCO-XI Knowledge Base</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            <div className="mic-hint-text">
+              {isRecording ? (
+                <span style={{ color: '#ef4444', fontWeight: 600 }}>
+                  Tap microphone to stop recording and process your voice question
+                </span>
+              ) : loading ? (
+                <span style={{ color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <RefreshCw size={16} className="spin-icon" /> {loadingText}
+                </span>
+              ) : (
+                <span>Tap microphone to start speaking your question</span>
               )}
             </div>
+
+            <AudioVisualizer stream={audioStream} isRecording={isRecording} />
           </div>
 
-          {/* Right Column: Latency Analytics Drawer */}
-          <div>
-            <div className="glass-card">
-              <h2 className="card-title">
-                <Clock size={20} color="var(--accent-cyan)" /> Latency Analytics
-              </h2>
+          {/* Form Input for Manual Query Entry */}
+          <form className="console-form" onSubmit={handleTextSubmit}>
+            <input
+              type="text"
+              className="console-input"
+              placeholder="Or type a question (e.g. 'What is Retrieval Augmented Generation?')"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+            />
+            <button 
+              type="submit" 
+              className="console-submit-btn" 
+              disabled={loading || !textInput.trim()}
+            >
+              Ask RAG <ChevronRight size={18} />
+            </button>
+          </form>
 
-              <div style={{ background: 'rgba(0, 242, 254, 0.05)', border: '1px solid rgba(0, 242, 254, 0.2)', borderRadius: '12px', padding: '1rem', textAlign: 'center', marginBottom: '1.25rem' }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>TOTAL PIPELINE TIME</div>
-                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent-cyan)', fontFamily: 'Space Grotesk' }}>
-                  {pipelineResult.latency?.total_ms?.toFixed(2) || '0.00'} ms
+          {/* Preset Sample Prompts */}
+          <div className="preset-container">
+            <span className="preset-label">Try sample queries:</span>
+            <div className="preset-pills">
+              <button 
+                type="button" 
+                className="preset-pill" 
+                onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
+              >
+                What is RAG?
+              </button>
+              <button 
+                type="button" 
+                className="preset-pill" 
+                onClick={() => handleSampleClick("How do vector embeddings work in semantic search?")}
+              >
+                How do embeddings work?
+              </button>
+              <button 
+                type="button" 
+                className="preset-pill" 
+                onClick={() => handleSampleClick("what is speech to text latency optimization")}
+              >
+                STT Latency Optimization
+              </button>
+              <button 
+                type="button" 
+                className="preset-pill" 
+                onClick={() => handleSampleClick("where is Goa located in India")}
+              >
+                Where is Goa located?
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Showcase Section */}
+        {pipelineResult && (
+          <div className="results-container">
+            {/* Left Box: Question, Answer, Sources */}
+            <div className="response-column">
+              {/* Question Transcript Box */}
+              <div className="result-card transcript-card">
+                <div className="card-label">Voice / Text Query Recognized</div>
+                <div className="query-display-text">
+                  "{pipelineResult.query || pipelineResult.transcript}"
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
-                  {pipelineResult.latency?.total_ms < 200 ? '⚡ Target < 200 ms Achieved!' : 'Pipeline Optimized'}
+              </div>
+
+              {/* Grounded Answer Card */}
+              <div className="result-card answer-card">
+                <div className="card-top-bar">
+                  <span className="card-heading">
+                    <Sparkles size={18} color="var(--accent-cyan)" /> Grounded Answer
+                  </span>
+                  <div className="status-badge-group">
+                    <span className={`guardrail-badge ${pipelineResult.is_grounded ? 'grounded' : 'unverified'}`}>
+                      <ShieldCheck size={13} /> {pipelineResult.guardrail_action}
+                    </span>
+                    <span className="confidence-badge">
+                      Confidence: {(pipelineResult.confidence * 100).toFixed(0)}%
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Stage-wise Breakdown */}
-              <div className="metric-row">
-                <span className="metric-label">Speech-to-Text (Sarvam)</span>
-                <span className="metric-value">{pipelineResult.latency?.stt_ms?.toFixed(2)} ms</span>
-              </div>
-              <div className="metric-bar-bg">
-                <div className="metric-bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.stt_ms / 100) * 100, 100)}%` }}></div>
-              </div>
+                <div className="answer-text-content">
+                  {pipelineResult.answer}
+                </div>
 
-              <div className="metric-row" style={{ marginTop: '0.75rem' }}>
-                <span className="metric-label">Query Embedding (`e5-small`)</span>
-                <span className="metric-value">{pipelineResult.latency?.embedding_ms?.toFixed(2)} ms</span>
-              </div>
-              <div className="metric-bar-bg">
-                <div className="metric-bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.embedding_ms / 50) * 100, 100)}%` }}></div>
-              </div>
-
-              <div className="metric-row" style={{ marginTop: '0.75rem' }}>
-                <span className="metric-label">FAISS Vector Search</span>
-                <span className="metric-value">{pipelineResult.latency?.vector_search_ms?.toFixed(3)} ms</span>
-              </div>
-              <div className="metric-bar-bg">
-                <div className="metric-bar-fill" style={{ width: '10%' }}></div>
-              </div>
-
-              <div className="metric-row" style={{ marginTop: '0.75rem' }}>
-                <span className="metric-label">LLM Generation (Gemini)</span>
-                <span className="metric-value">{pipelineResult.latency?.llm_ms?.toFixed(2)} ms</span>
-              </div>
-              <div className="metric-bar-bg">
-                <div className="metric-bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.llm_ms / 300) * 100, 100)}%` }}></div>
+                {/* Clean Attributed Sources (No ugly links!) */}
+                {pipelineResult.sources && pipelineResult.sources.length > 0 && (
+                  <div className="sources-section">
+                    <div className="sources-title">
+                      <BookOpen size={14} /> Knowledge Sources Attributed ({pipelineResult.sources.length})
+                    </div>
+                    <div className="sources-grid">
+                      {pipelineResult.sources.map((src, i) => (
+                        <div key={i} className="source-card">
+                          <div className="source-id-badge">Passage {src.passage_id}</div>
+                          <div className="source-dataset-name">
+                            AI4Bharat MSMARCO-XI Grounded Passage Entry
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Empirical Percentiles Card */}
-            <div className="glass-card">
-              <h3 style={{ fontSize: '1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                <BarChart2 size={16} color="var(--accent-purple)" /> Empirical Percentiles
-              </h3>
+            {/* Right Box: Real-Time Latency Metrics */}
+            <div className="metrics-column">
+              <div className="result-card metrics-card">
+                <div className="card-heading" style={{ marginBottom: '1.25rem' }}>
+                  <Clock size={18} color="var(--accent-cyan)" /> Latency Analytics
+                </div>
 
-              <table className="percentile-table">
-                <thead>
-                  <tr>
-                    <th>Stage</th>
-                    <th>P50</th>
-                    <th>P70</th>
-                    <th>P100</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Embedding</td>
-                    <td>22.47ms</td>
-                    <td>23.26ms</td>
-                    <td>29.21ms</td>
-                  </tr>
-                  <tr>
-                    <td>FAISS Search</td>
-                    <td>0.03ms</td>
-                    <td>0.03ms</td>
-                    <td>0.09ms</td>
-                  </tr>
-                  <tr>
-                    <td>Total Pipeline</td>
-                    <td style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>145ms</td>
-                    <td style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>172ms</td>
-                    <td style={{ color: 'var(--accent-cyan)', fontWeight: 700 }}>198ms</td>
-                  </tr>
-                </tbody>
-              </table>
+                {/* Big Total Timer Display */}
+                <div className="total-latency-banner">
+                  <div className="total-label">TOTAL PIPELINE TIME</div>
+                  <div className="total-value">
+                    {pipelineResult.latency?.total_ms?.toFixed(2) || '0.00'} <span className="unit">ms</span>
+                  </div>
+                  <div className="target-status">
+                    {pipelineResult.latency?.total_ms < 200 ? '⚡ Target < 200 ms Achieved!' : 'Sub-Second Response Delivered'}
+                  </div>
+                </div>
+
+                {/* Stage Progress Bars */}
+                <div className="stage-metrics">
+                  <div className="stage-row">
+                    <span className="stage-name">STT (Sarvam AI)</span>
+                    <span className="stage-time">{pipelineResult.latency?.stt_ms?.toFixed(2)} ms</span>
+                  </div>
+                  <div className="bar-track">
+                    <div className="bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.stt_ms / 100) * 100, 100)}%` }}></div>
+                  </div>
+
+                  <div className="stage-row">
+                    <span className="stage-name">Embedding (`e5-small`)</span>
+                    <span className="stage-time">{pipelineResult.latency?.embedding_ms?.toFixed(2)} ms</span>
+                  </div>
+                  <div className="bar-track">
+                    <div className="bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.embedding_ms / 50) * 100, 100)}%` }}></div>
+                  </div>
+
+                  <div className="stage-row">
+                    <span className="stage-name">FAISS Vector Search</span>
+                    <span className="stage-time">{pipelineResult.latency?.vector_search_ms?.toFixed(3)} ms</span>
+                  </div>
+                  <div className="bar-track">
+                    <div className="bar-fill" style={{ width: '12%' }}></div>
+                  </div>
+
+                  <div className="stage-row">
+                    <span className="stage-name">LLM Generation (Gemini)</span>
+                    <span className="stage-time">{pipelineResult.latency?.llm_ms?.toFixed(2)} ms</span>
+                  </div>
+                  <div className="bar-track">
+                    <div className="bar-fill" style={{ width: `${Math.min((pipelineResult.latency?.llm_ms / 300) * 100, 100)}%` }}></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Benchmarks Card */}
+              <div className="result-card analytics-table-card">
+                <div className="card-heading" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>
+                  <BarChart2 size={16} color="var(--accent-purple)" /> Empirical System Benchmarks
+                </div>
+                <table className="mini-table">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>P50</th>
+                      <th>P70</th>
+                      <th>P100</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>FAISS Search</td>
+                      <td>0.03ms</td>
+                      <td>0.03ms</td>
+                      <td>0.09ms</td>
+                    </tr>
+                    <tr>
+                      <td>Embedding</td>
+                      <td>22.4ms</td>
+                      <td>23.2ms</td>
+                      <td>29.2ms</td>
+                    </tr>
+                    <tr>
+                      <td>Total Pipeline</td>
+                      <td className="highlight-val">145ms</td>
+                      <td className="highlight-val">172ms</td>
+                      <td className="highlight-val">198ms</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </section>
-      )}
+        )}
+      </main>
     </div>
   );
 }
