@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mic, MicOff, Send, Sparkles, Activity, ShieldCheck, 
   Clock, CheckCircle2, AlertTriangle, RefreshCw, BarChart2,
-  BookOpen, ChevronRight, MessageSquare, Volume2, Info
+  BookOpen, ChevronRight, MessageSquare, Volume2, Info, Zap
 } from 'lucide-react';
 import AudioVisualizer from './AudioVisualizer';
 
