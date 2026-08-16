@@ -24,10 +24,9 @@ app.include_router(pipeline_router)
 
 @app.on_event("startup")
 async def startup_prewarm_event():
-    print("[*] FastAPI Server Startup: Pre-warming models & loading FAISS index...")
-    pipeline_services.initialize()
-    optimizer = LatencyOptimizer(pipeline_services.embedding_engine)
-    optimizer.prewarm()
+    print("[*] FastAPI Server Startup: Readying services...")
+    if pipeline_services.embedding_engine is None:
+        pipeline_services.initialize()
     print("[+] FastAPI Server ready for sub-200ms requests!")
 
 @app.get("/")

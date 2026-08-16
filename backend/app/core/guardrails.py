@@ -60,14 +60,14 @@ class GuardrailsEngine:
 
         # Step 2: Context Availability & Relevance Check
         if not retrieved_chunks:
-            # Fallback to general AI knowledge rather than refusing to answer!
+            # Fallback when query has no matching dataset passages
             return GuardrailResult(
                 is_safe=True,
-                is_on_topic=True,
-                is_grounded=True,
-                confidence=0.85,
-                final_answer=llm_answer if llm_answer else f"Based on general knowledge: {query} is a broad topic.",
-                action_taken="GENERAL_KNOWLEDGE_ANSWERED"
+                is_on_topic=False,
+                is_grounded=False,
+                confidence=0.50,
+                final_answer=f"I couldn't find enough information in the knowledge base for '{query}'.",
+                action_taken="REJECTED_OFF_TOPIC"
             )
 
         # Step 3: Grounded Passage Citation Check
