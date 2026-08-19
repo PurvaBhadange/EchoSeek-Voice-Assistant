@@ -11,4 +11,5 @@ google-genai>=0.1.0
 numpy>=1.26.0
 datasets>=2.18.0
 huggingface-hub>=0.21.0
+python-multipart>=0.0.6
 pytest>=8.1.0
