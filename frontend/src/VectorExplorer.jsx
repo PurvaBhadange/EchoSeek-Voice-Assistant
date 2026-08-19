@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Database, Sliders, Hash, ArrowUpRight, Zap, RefreshCw, FileText } from 'lucide-react';
+import { getApiUrl } from './apiConfig';
 
 export default function VectorExplorer({ settings }) {
   const [queryText, setQueryText] = useState('what is retrieval augmented generation');
@@ -17,7 +18,7 @@ export default function VectorExplorer({ settings }) {
     setError(null);
 
     try {
-      const res = await fetch('/api/v1/search', {
+      const res = await fetch(getApiUrl('/api/v1/search'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

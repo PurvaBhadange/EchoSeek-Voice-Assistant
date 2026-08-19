@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Database, UploadCloud, FileText, Plus, CheckCircle2, AlertCircle, RefreshCw, BookOpen } from 'lucide-react';
+import { getApiUrl } from './apiConfig';
 
 export default function DatasetIngestion() {
   const [datasetsInfo, setDatasetsInfo] = useState(null);
@@ -18,7 +19,7 @@ export default function DatasetIngestion() {
   const fetchDatasetInfo = async () => {
     setLoadingInfo(true);
     try {
-      const res = await fetch('/api/v1/datasets');
+      const res = await fetch(getApiUrl('/api/v1/datasets'));
       if (res.ok) {
         const data = await res.json();
         setDatasetsInfo(data);
@@ -61,7 +62,7 @@ export default function DatasetIngestion() {
     if (sourceUrl) formData.append('source_url', sourceUrl);
 
     try {
-      const res = await fetch('/api/v1/ingest', {
+      const res = await fetch(getApiUrl('/api/v1/ingest'), {
         method: 'POST',
         body: formData
       });

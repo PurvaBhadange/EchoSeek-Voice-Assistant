@@ -10,6 +10,7 @@ import VectorExplorer from './VectorExplorer';
 import QueryHistory from './QueryHistory';
 import DatasetIngestion from './DatasetIngestion';
 import SettingsModal from './SettingsModal';
+import { getApiUrl } from './apiConfig';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('console'); // 'console' | 'explorer' | 'history' | 'datasets'
@@ -41,7 +42,7 @@ export default function App() {
 
   // Fetch backend health status on mount
   useEffect(() => {
-    fetch('/api/health')
+    fetch(getApiUrl('/api/health'))
       .then((res) => res.json())
       .then((data) => setHealth(data))
       .catch(() => setHealth({ status: 'offline' }));
@@ -152,7 +153,7 @@ export default function App() {
     }
 
     try {
-      let res = await fetch('/api/v1/voice-query', {
+      let res = await fetch(getApiUrl('/api/v1/voice-query'), {
         method: 'POST',
         body: formData
       });
@@ -160,7 +161,7 @@ export default function App() {
       if (res.status === 502 || res.status === 504) {
         setLoadingText('Waking up server instance... Retrying in 2 seconds...');
         await new Promise((resolve) => setTimeout(resolve, 2500));
-        res = await fetch('/api/v1/voice-query', {
+        res = await fetch(getApiUrl('/api/v1/voice-query'), {
           method: 'POST',
           body: formData
         });
@@ -190,7 +191,7 @@ export default function App() {
     setErrorMessage(null);
 
     try {
-      let res = await fetch('/api/v1/query', {
+      let res = await fetch(getApiUrl('/api/v1/query'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -203,7 +204,7 @@ export default function App() {
       if (res.status === 502 || res.status === 504) {
         setLoadingText('Waking up server instance... Retrying in 2 seconds...');
         await new Promise((resolve) => setTimeout(resolve, 2500));
-        res = await fetch('/api/v1/query', {
+        res = await fetch(getApiUrl('/api/v1/query'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

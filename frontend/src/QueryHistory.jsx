@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { History, Trash2, Clock, CheckCircle, AlertTriangle, Mic, MessageSquare, RefreshCw } from 'lucide-react';
+import { getApiUrl } from './apiConfig';
 
 export default function QueryHistory() {
   const [historyData, setHistoryData] = useState([]);
@@ -8,7 +9,7 @@ export default function QueryHistory() {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/history');
+      const res = await fetch(getApiUrl('/api/v1/history'));
       if (res.ok) {
         const data = await res.json();
         setHistoryData(data.history || []);
@@ -27,7 +28,7 @@ export default function QueryHistory() {
   const handleClearHistory = async () => {
     if (!window.confirm('Are you sure you want to clear all query history logs?')) return;
     try {
-      await fetch('/api/v1/history', { method: 'DELETE' });
+      await fetch(getApiUrl('/api/v1/history'), { method: 'DELETE' });
       setHistoryData([]);
     } catch (err) {
       alert('Failed to clear history');

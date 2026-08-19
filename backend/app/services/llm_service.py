@@ -33,7 +33,7 @@ class GeminiLLMService:
         if not search_results:
             return (
                 f"You are EchoSeek, a helpful AI assistant.\n"
-                f"Answer the user's question directly and accurately in 2-3 sentences:\n\n"
+                f"Answer the user's question directly and accurately in 2-3 sentences in the SAME language as the question:\n\n"
                 f"QUESTION: {query}\n\nANSWER:"
             )
 
@@ -47,7 +47,7 @@ class GeminiLLMService:
         
         prompt = (
             f"You are EchoSeek, an intelligent voice RAG assistant.\n"
-            f"Answer the user's question concisely in 2-3 sentences.\n"
+            f"Answer the user's question concisely in 2-3 sentences in the SAME language as the user's question (e.g., respond in Hindi if asked in Hindi, in English if asked in English).\n"
             f"Use the provided CONTEXT PASSAGES below if relevant:\n\n"
             f"=== CONTEXT PASSAGES ===\n"
             f"{formatted_context}\n\n"
