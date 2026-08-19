@@ -14,12 +14,7 @@ class Settings(BaseSettings):
     HOST: str = os.getenv("HOST", "0.0.0.0")
     
     # CORS Origins
-    CORS_ORIGINS: Any = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
-    ]
+    CORS_ORIGINS: Any = ["*"]
     
     # API Keys
     SARVAM_API_KEY: str = os.getenv("SARVAM_API_KEY", "")
