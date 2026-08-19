@@ -26,6 +26,7 @@ export default function App() {
   const [audioStream, setAudioStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [speechRecognizer, setSpeechRecognizer] = useState(null);
+  const [voiceLanguage, setVoiceLanguage] = useState('hi-IN'); // Default to Hindi (hi-IN)
   const [textInput, setTextInput] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -78,7 +79,7 @@ export default function App() {
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'en-US';
+        recognition.lang = voiceLanguage;
 
         recognition.onresult = (event) => {
           let currentTranscript = '';
@@ -151,10 +152,20 @@ export default function App() {
     }
 
     try {
-      const res = await fetch('/api/v1/voice-query', {
+      let res = await fetch('/api/v1/voice-query', {
         method: 'POST',
         body: formData
       });
+
+      if (res.status === 502 || res.status === 504) {
+        setLoadingText('Waking up server instance... Retrying in 2 seconds...');
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        res = await fetch('/api/v1/voice-query', {
+          method: 'POST',
+          body: formData
+        });
+      }
+
       if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to process voice query`);
       const data = await res.json();
       setPipelineResult(data);
@@ -179,7 +190,7 @@ export default function App() {
     setErrorMessage(null);
 
     try {
-      const res = await fetch('/api/v1/query', {
+      let res = await fetch('/api/v1/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -188,6 +199,21 @@ export default function App() {
           score_threshold: settings.score_threshold
         })
       });
+
+      if (res.status === 502 || res.status === 504) {
+        setLoadingText('Waking up server instance... Retrying in 2 seconds...');
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        res = await fetch('/api/v1/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: cleanQuery,
+            top_k: settings.top_k,
+            score_threshold: settings.score_threshold
+          })
+        });
+      }
+
       if (!res.ok) throw new Error(`HTTP ${res.status}: Query processing failed`);
       const data = await res.json();
       setPipelineResult(data);
@@ -297,15 +323,44 @@ export default function App() {
 
           {/* Central Voice & Text Input Console */}
           <div className={`console-card ${isRecording ? 'active-recording' : ''}`}>
-            <div className="console-header">
+            <div className="console-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span className="console-title">
                 <MessageSquare size={16} color="var(--accent-cyan)" /> Voice Dictation Console
               </span>
-              {isRecording && (
-                <span className="recording-timer">
-                  <span className="red-pulse"></span> Listening... ({recordingTime}s)
-                </span>
-              )}
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div className="voice-lang-select-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Voice Lang:</span>
+                  <select 
+                    value={voiceLanguage} 
+                    onChange={(e) => setVoiceLanguage(e.target.value)}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '6px',
+                      padding: '0.25rem 0.5rem',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="hi-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Hindi (हिन्दी)</option>
+                    <option value="en-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Indian English</option>
+                    <option value="en-US" style={{ background: '#1e1e2d', color: '#fff' }}>🇺🇸 US English</option>
+                    <option value="mr-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Marathi (मराठी)</option>
+                    <option value="ta-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Tamil (தமிழ்)</option>
+                    <option value="te-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Telugu (తెలుగు)</option>
+                    <option value="bn-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Bengali (বাংলা)</option>
+                  </select>
+                </div>
+
+                {isRecording && (
+                  <span className="recording-timer">
+                    <span className="red-pulse"></span> Listening... ({recordingTime}s)
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="mic-stage">
@@ -321,7 +376,7 @@ export default function App() {
               <div className="mic-hint-text">
                 {isRecording ? (
                   <span style={{ color: '#ef4444', fontWeight: 600 }}>
-                    Speak your question... Words are typing live below! Tap mic again to submit.
+                    Speak your question in {voiceLanguage === 'hi-IN' ? 'Hindi' : 'your chosen language'}... Words are typing live below! Tap mic again to submit.
                   </span>
                 ) : loading ? (
                   <span style={{ color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -340,7 +395,7 @@ export default function App() {
               <input
                 type="text"
                 className="console-input"
-                placeholder="Spoken words type live here... Or type a question manually"
+                placeholder="Spoken words type live here... Or type a question in Hindi / English"
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
               />
@@ -360,23 +415,30 @@ export default function App() {
                 <button 
                   type="button" 
                   className="preset-pill" 
+                  onClick={() => handleSampleClick("गोवा भारत के किस तट पर स्थित है?")}
+                >
+                  🇮🇳 गोवा किस तट पर है?
+                </button>
+                <button 
+                  type="button" 
+                  className="preset-pill" 
+                  onClick={() => handleSampleClick("Sarvam AI किस लिए प्रसिद्ध है?")}
+                >
+                  🇮🇳 Sarvam AI क्या है?
+                </button>
+                <button 
+                  type="button" 
+                  className="preset-pill" 
+                  onClick={() => handleSampleClick("वेक्टर एम्बेडिंग सेमांटिक सर्च में कैसे काम करते हैं?")}
+                >
+                  🇮🇳 वेक्टर एम्बेडिंग?
+                </button>
+                <button 
+                  type="button" 
+                  className="preset-pill" 
                   onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
                 >
                   What is RAG?
-                </button>
-                <button 
-                  type="button" 
-                  className="preset-pill" 
-                  onClick={() => handleSampleClick("How do vector embeddings work in semantic search?")}
-                >
-                  How do embeddings work?
-                </button>
-                <button 
-                  type="button" 
-                  className="preset-pill" 
-                  onClick={() => handleSampleClick("what is speech to text latency optimization")}
-                >
-                  STT Latency Optimization
                 </button>
                 <button 
                   type="button" 
