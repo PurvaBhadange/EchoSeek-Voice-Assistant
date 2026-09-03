@@ -1,4 +1,4 @@
-# Hacker House Goa 2026 — Task 2: Voice-Enabled RAG Model
+# Voice-Enabled RAG Model
 
 A low-latency (<200 ms target) voice-driven Retrieval-Augmented Generation (RAG) system built on the **AI4Bharat MSMARCO-XI** dataset.
 
