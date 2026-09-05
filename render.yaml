@@ -3,7 +3,7 @@ services:
     name: echoseek-backend
     env: python
     region: singapore
-    buildCommand: pip install --no-cache-dir -r backend/requirements.txt
+    buildCommand: pip install --no-cache-dir -r backend/requirements.txt && PYTHONPATH=backend python scripts/prepare_dataset_subset.py && PYTHONPATH=backend python scripts/generate_embeddings.py
     startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PYTHON_VERSION

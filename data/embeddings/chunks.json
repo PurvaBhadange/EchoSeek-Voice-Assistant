@@ -1,0 +1,851 @@
+[
+  {
+    "chunk_id": "chunk_p101",
+    "text": "Retrieval-Augmented Generation (RAG) is an architectural pattern in AI that enhances Large Language Models by retrieving relevant factual documents from an external knowledge base before generating an answer. RAG reduces hallucinations and grounds responses in verified data.",
+    "passage_id": "p101",
+    "url": "https://ai.example.org/rag-explanation",
+    "language": "en",
+    "char_length": 275,
+    "word_count": 37,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "101",
+      "sentence_count": 2,
+      "source_url": "https://ai.example.org/rag-explanation",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p102",
+    "text": "Vector embeddings represent text as dense mathematical vectors in a high-dimensional space. Words or sentences with similar semantic meanings are placed close together in this vector space. Semantic search uses distance metrics like cosine similarity or dot product to find relevant documents even when exact keyword matches are absent.",
+    "passage_id": "p102",
+    "url": "https://ai.example.org/embeddings",
+    "language": "en",
+    "char_length": 336,
+    "word_count": 49,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "102",
+      "sentence_count": 3,
+      "source_url": "https://ai.example.org/embeddings",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p103",
+    "text": "Speech-to-Text (STT) latency optimization involves streaming audio buffers over WebSocket connections, selecting lightweight acoustic models like Sarvam AI or ElevenLabs, and utilizing VAD (Voice Activity Detection) to process speech chunks immediately rather than waiting for silence.",
+    "passage_id": "p103",
+    "url": "https://ai.example.org/stt-latency",
+    "language": "en",
+    "char_length": 285,
+    "word_count": 36,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "103",
+      "sentence_count": 1,
+      "source_url": "https://ai.example.org/stt-latency",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p104",
+    "text": "FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search and clustering of dense vectors. It contains algorithms that search in sets of vectors of any size, up to ones that may not fit in RAM. It offers GPU support and HNSW indexing for sub-millisecond search.",
+    "passage_id": "p104",
+    "url": "https://ai.example.org/faiss",
+    "language": "en",
+    "char_length": 299,
+    "word_count": 49,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "104",
+      "sentence_count": 3,
+      "source_url": "https://ai.example.org/faiss",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p105",
+    "text": "Goa is a state located on the southwestern coast of India within the Konkan region. It is bounded by Maharashtra to the north and Karnataka to the east and south, with the Arabian Sea forming its western coast. It is India's smallest state by area.",
+    "passage_id": "p105",
+    "url": "https://geography.example.org/goa",
+    "language": "en",
+    "char_length": 248,
+    "word_count": 45,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "105",
+      "sentence_count": 3,
+      "source_url": "https://geography.example.org/goa",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p106",
+    "text": "Sarvam AI is an Indian AI research organization focused on building generative AI models and voice infrastructure tailored for Indic languages and regional accents. Sarvam provides fast Speech-to-Text (STT) APIs optimized for Indian English and native Indian languages.",
+    "passage_id": "p106",
+    "url": "https://ai.example.org/sarvam",
+    "language": "en",
+    "char_length": 269,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "106",
+      "sentence_count": 2,
+      "source_url": "https://ai.example.org/sarvam",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p107",
+    "text": "P50 latency represents the median response time where 50% of requests are faster. P70 is the 70th percentile, and P100 represents the worst-case maximum latency recorded across all requests. Percentile measurement helps identify long-tail network and model delays.",
+    "passage_id": "p107",
+    "url": "https://systems.example.org/latency-metrics",
+    "language": "en",
+    "char_length": 264,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "107",
+      "sentence_count": 3,
+      "source_url": "https://systems.example.org/latency-metrics",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p108",
+    "text": "Guardrails in RAG pipelines validate incoming user prompts and outgoing generated answers. Grounding guardrails verify that every statement in the generated answer is directly supported by retrieved context passages, rejecting ungrounded or off-topic responses.",
+    "passage_id": "p108",
+    "url": "https://ai.example.org/guardrails",
+    "language": "en",
+    "char_length": 261,
+    "word_count": 34,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "108",
+      "sentence_count": 2,
+      "source_url": "https://ai.example.org/guardrails",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p109",
+    "text": "intfloat/multilingual-e5-small is a 12-layer Transformer embedding model trained on multilingual text pairs. It maps queries and passages into a shared 384-dimensional vector space with prefix instructions like 'query: ' and 'passage: ' for asymmetric retrieval.",
+    "passage_id": "p109",
+    "url": "https://huggingface.co/intfloat/multilingual-e5-small",
+    "language": "en",
+    "char_length": 262,
+    "word_count": 35,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "109",
+      "sentence_count": 2,
+      "source_url": "https://huggingface.co/intfloat/multilingual-e5-small",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "chunk_p110",
+    "text": "Google Gemini 1. 5 Flash is a lightweight, multimodal model optimized for high frequency, low latency tasks. It features a massive context window of up to 1 million tokens and strong structured JSON extraction abilities.",
+    "passage_id": "p110",
+    "url": "https://ai.google.dev/gemini",
+    "language": "en",
+    "char_length": 220,
+    "word_count": 35,
+    "metadata": {
+      "strategy": "metadata_aware_passage",
+      "query_id": "110",
+      "sentence_count": 3,
+      "source_url": "https://ai.google.dev/gemini",
+      "has_grounding_url": true
+    }
+  },
+  {
+    "chunk_id": "usr_1788617377_rec_0",
+    "text": "EchoSeek Voice Assistant created by Team Frontiers at Hacker House Goa 2026. Supporting universal document ingestion for PDF, Word, CSV, Excel, JSON and TXT.",
+    "passage_id": "usr_1788617377",
+    "url": "",
+    "language": "en",
+    "char_length": 157,
+    "word_count": 24,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 0
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_0",
+    "text": "[Page 1]\nGOVERNMENT INNOVATION\nSankalp\nAI-Powered Innovation Procurement\nPlatform\nFrom government challenges to evaluated, measurable startup solutions. Team Name : FROENTIERS\nMembers Name :\n1. Purva Bhadange\n2.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 211,
+    "word_count": 28,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 0
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_1",
+    "text": "e : FROENTIERS\nMembers Name :\n1. Purva Bhadange\n2. Atharva Wani\n\n[Page 2]\nTHE CHALLENGE\nWhy Government Innovation Procurement Is Broken\nHard to Discover\nGovernment requirements are scattered, poorly\nstructured, and difficult for startups to find and\nunderstand.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 261,
+    "word_count": 39,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 1
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_2",
+    "text": "and difficult for startups to find and\nunderstand. Inconsistent Proposals\nSubmissions arrive in varied formats, making fair\nand efficient side-by-side comparison nearly\nimpossible. Slow & Subjective Evaluation\nManual review processes are time-consuming and\nprone to inconsistency and bias.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 289,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 2
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_3",
+    "text": "ime-consuming and\nprone to inconsistency and bias. No Pilot Visibility\nOnce a pilot begins, progress is difficult to track,\nand milestones go unmeasured. Limited Transparency\nCitizens, auditors, and stakeholders lack visibility\ninto outcomes and how public funds are spent.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 273,
+    "word_count": 39,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 3
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_4",
+    "text": "lity\ninto outcomes and how public funds are spent. The Data Gap\nGovernment procurement is slow, fragmented, and\ndifficult for startups to navigate. [Page 3]\nFeasibility\n  Time-Feasible\nAll core modules can be\ndeveloped within the given\ntimeline with the iterative spirit.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 271,
+    "word_count": 41,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 4
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_5",
+    "text": "thin the given\ntimeline with the iterative spirit. Scalable\nDesign to handle more\nDepartments, Startups & users as\nthe platform grows. Low Cost\nBuilt using open-source tools and\nfree/low-cost cloud services to\nminimize cost.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 224,
+    "word_count": 34,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 5
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_6",
+    "text": "and\nfree/low-cost cloud services to\nminimize cost. Modular Design\nEach module works\nindependently, allowing easy\nupdates and maintainance.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 138,
+    "word_count": 18,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 6
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_7",
+    "text": "pendently, allowing easy\nupdates and maintainance. FEASIBILITY AND VIABILITY\nCHALLENGES AND STRATEGIES TO OVERCOME\nDATA QUALITY &\nAVAILABILITY\nAI MATCHING\nACCURACY\nINTEGRATION WITH\nEXISTING SYSTEMS\nSTRUCTURED VALIDATION\n& VERIFICATION\nHUMAN-IN-THE-LOOP\nAPPROACH\nPHASED ROLLOUT &\nTRAINING\nVariations in startup data\nacross government\nrequirements.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 346,
+    "word_count": 42,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 7
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_8",
+    "text": "ns in startup data\nacross government\nrequirements. AI recommendations\nmay not always be\n100% accurate. Connecting with existing\ngovernment platforms\ncan be complex. Experts review AI\nrecommendations\nbefore final decisions. Use structured forms,\nvalidation rules and\nmanual verification.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 286,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 8
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_9",
+    "text": "d forms,\nvalidation rules and\nmanual verification. Start with  a pilot\nDepartment & provide\ntraining for officers and\nstartups\n\n[Page 4]\nIMPACT AND BENEFITS\nKEY BENEFITS\nIMPACT ON STAKEHOLDERS\nGovernment Departments\nRapid adoption of innovative solutions to enhance\npublic services and operational efficiency.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 309,
+    "word_count": 43,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 9
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_10",
+    "text": "nhance\npublic services and operational efficiency. Accelerated growth, increased efficiency, and\ndirect access to large-scale government projects. Startups\nCitizens\nImproved quality of life through faster, more\neffective delivery of citizen-centric services.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 258,
+    "word_count": 31,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 10
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_11",
+    "text": "re\neffective delivery of citizen-centric services. Government Ecosystem\nFoster a collaborative environment between public and\nprivate sectors, driving digital transformation. National Impact\nSignificant contribution to economic growth, job\ncreation, and technological advancement nationwide.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 291,
+    "word_count": 33,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 11
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_12",
+    "text": "reation, and technological advancement nationwide. Speed of Execution\nDrastically reduce time-to-solution from years to months\nwith AI-driven matches and streamlined processes.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 176,
+    "word_count": 21,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 12
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_13",
+    "text": "with AI-driven matches and streamlined processes. Precision Matching\nLeverage advanced AI algorithms to accurately connect specific\ngovernment needs with the most relevant startup solutions.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 190,
+    "word_count": 24,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 13
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_14",
+    "text": "nt needs with the most relevant startup solutions. Seamless Integration\nFacilitate smooth pilot testing and scalable deployment of proven\ninnovations within government frameworks.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 179,
+    "word_count": 23,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 14
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_15",
+    "text": "f proven\ninnovations within government frameworks. Scalable Innovation\nIdentify and rapidly scale successful pilot projects across multiple\ndepartments and regions for maximum impact.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 183,
+    "word_count": 23,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 15
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_16",
+    "text": "ltiple\ndepartments and regions for maximum impact. Trust & Transparency\nEnsure fair play, accountability, and clear tracking of project\nprogress and outcomes through secure digital workflows.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 191,
+    "word_count": 26,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 16
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_17",
+    "text": "ess and outcomes through secure digital workflows. OUR SOLUTION \nAi – powered platform that connects government demands with the right startups and help scale proven innovation.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 177,
+    "word_count": 26,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 17
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_18",
+    "text": "e right startups and help scale proven innovation. [Page 5]\nWORKFLOW\nEvery step is logged, structured, and traceable — giving all stakeholders a clear, consistent view of the procurement journey.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 195,
+    "word_count": 30,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 18
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_19",
+    "text": "clear, consistent view of the procurement journey. [Page 6]\nAI EVALUATION\nAI-Powered Proposal Evaluation\nSankalp's AI evaluator analyzes each proposal against the department's\npublished requirement — producing structured, comparable outputs. AI\nassists human decision-makers; it does not replace them.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 301,
+    "word_count": 39,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 19
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_20",
+    "text": "s human decision-makers; it does not replace them. Readiness Score\nQuantified fit between proposal and requirement\nStrengths & Weaknesses\nStructured breakdown of proposal quality\nEligibility & Outlier Checks\nFlags missing criteria or anomalies\nComparable Scoring\nStandardized output for side-by-side comparison\n\n[Page 7]\nARCHITECTURE\nPlatform Architecture\nNext.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 361,
+    "word_count": 46,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 20
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_21",
+    "text": "[Page 7]\nARCHITECTURE\nPlatform Architecture\nNext. js Frontend\nRole-specific dashboards for departments, startups and administrators\nFastAPI Backend\nAPI routes, authentication and role-based access control (RBAC)\nPostgreSQL + pgvector\nStructured data storage with vector search for semantic matching\nAI / Gemini Services\nProposal evaluation, eligibility checks, scoring and feedback generation\nAudit & Document Modules\nImmutable audit logs, document handling and traceability records\n\n[Page 8]\nDATA & TRANSPARENCY\nData Model & Transparency by Design\nCore Entity Relationships\nGovernance & Accountability\nRole-Based Access\nDepartment officials, startup users and\nadmins see only what is relevant to their\nrole\nAudit Logs\nEvery action — submission, evaluation,\nstatus change — is timestamped and\nrecorded\nStandardized Evaluation\nUniform scoring criteria ensure decisions\nare consistent and defensible\nPublic Records\nPilot outcomes and spending decisions\nare traceable and shareable where\napplicable\n\n[Page 9]\nIMPACT & FUTURE\nWhat Sankalp Delivers\nGovernment\nFaster evaluation, better proposal comparison,\nand improved accountability across\nprocurement decisions\nStartups\nClear opportunities to discover, standardized\nsubmission experience, and fairer AI-assisted\nevaluation\nCitizens\nGreater visibility into public innovation spending and more effective, measurable outcomes\nSankalp turns fragmented innovation procurement into a structured, AI-assisted and\nmeasurable journey.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 1473,
+    "word_count": 188,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 21
+    }
+  },
+  {
+    "chunk_id": "usr_1788617501_rec_22",
+    "text": "a structured, AI-assisted and\nmeasurable journey. DISCOVER\n EVALUATE\n PILOT\n MEASURE.",
+    "passage_id": "usr_1788617501",
+    "url": "",
+    "language": "en",
+    "char_length": 85,
+    "word_count": 10,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 22
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_0",
+    "text": "Activity Title: Apply project management concepts to develop a basic project plan.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 82,
+    "word_count": 12,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 0
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_1",
+    "text": "nagement concepts to develop a basic project plan. Problem Statement- Develop ShelfLife, an intelligent inventory management system that identifies near-expiry products and recommends suitable actions such as Discount, Transfer, Return/Donate, or Dispose to reduce product waste and financial losses.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 300,
+    "word_count": 39,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 1
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_2",
+    "text": "pose to reduce product waste and financial losses. Outcome: Students will be able to apply basic project management concepts by identifying stakeholder roles, selecting an appropriate development approach, and planning key project activities for a given real-life industrial project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 283,
+    "word_count": 39,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 2
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_3",
+    "text": "tivities for a given real-life industrial project. Group Information\n\nAssessment\n\nCriteria \tMarks\n\nProject Identification & Objective \t___ / 2\n\nProject Life Cycle Understanding \t___ / 1\n\nProject Initiator & Stakeholders \t___ / 2\n\nProject Charter & Planning Elements ___ / 3\n\nDevelopment Approach & Benefits \t___ / 2\n\nTotal Marks \t___ / 10\n\nNAME & SIGN of Course Teacher:\n\nIdentify the real-life industrial project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 414,
+    "word_count": 64,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 3
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_4",
+    "text": "acher:\n\nIdentify the real-life industrial project. The selected real-life industrial project is the development of ShelfLife — Intelligent Near-Expiry Inventory Rescue and Recovery Platform.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 190,
+    "word_count": 24,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 4
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_5",
+    "text": "ear-Expiry Inventory Rescue and Recovery Platform. ShelfLife helps businesses identify products approaching their expiry date by tracking inventory, expiry dates, quantity, and demand.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 184,
+    "word_count": 23,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 5
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_6",
+    "text": "ing inventory, expiry dates, quantity, and demand. It assigns an expiry-risk level and recommends suitable actions such as Discount, Transfer, Return/Donate, or Dispose to reduce product waste and financial loss. State the objectives of the project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 249,
+    "word_count": 36,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 6
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_7",
+    "text": "nancial loss. State the objectives of the project. To continuously track inventory quantities and product expiry dates. To identify products that are approaching expiry and classify them according to their expiry risk.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 218,
+    "word_count": 32,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 7
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_8",
+    "text": "and classify them according to their expiry risk. To recommend suitable recovery actions such as Discount, Transfer, Return/Donate, or Dispose. To reduce financial losses and product waste caused by expired inventory. List the phases of the project life cycle for the selected project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 285,
+    "word_count": 43,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 8
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_9",
+    "text": "f the project life cycle for the selected project. Project Initiation – Identify the problem, objectives, and stakeholders. Project Planning – Define scope, activities, resources, schedule, cost, and risks. Project Execution – Design and develop the ShelfLife platform.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 269,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 9
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_10",
+    "text": "ution – Design and develop the ShelfLife platform. Monitoring and Controlling – Monitor progress, quality, risks, and test the system. Project Closing – Complete final testing, implement the system, and close the project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 221,
+    "word_count": 33,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 10
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_11",
+    "text": "ting, implement the system, and close the project. Who is the Project Initiator for the identified project?\n\nThe Inventory Manager acts as the Project Initiator for the ShelfLife project. The Inventory Manager identifies the problem of products remaining unsold as they approach their expiry dates.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 298,
+    "word_count": 45,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 11
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_12",
+    "text": "aining unsold as they approach their expiry dates. This can result in financial losses, unnecessary inventory accumulation, and product waste.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 142,
+    "word_count": 20,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 12
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_13",
+    "text": "cessary inventory accumulation, and product waste. Therefore, the Inventory Manager initiates the project to introduce a systematic platform that can identify near-expiry products early and support timely decisions such as discounting, transferring, returning/donating, or disposing of the products.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 299,
+    "word_count": 38,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 13
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_14",
+    "text": "returning/donating, or disposing of the products. Identify the following stakeholders related to your project. Customer: RetailBusiness / Warehouse Management.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 159,
+    "word_count": 19,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 14
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_15",
+    "text": ". Customer: RetailBusiness / Warehouse Management. The customer is the business organization that requires the ShelfLife platform to manage its inventory and reduce losses caused by near-expiry products. Sponsor: Business Management/Business Owner.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 248,
+    "word_count": 32,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 15
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_16",
+    "text": "ucts. Sponsor: Business Management/Business Owner. The sponsor provides financial support, approves the project, and provides the necessary organizational support and resources for implementation. Performing Organization: Software\tDevelopment and Project Management Team.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 271,
+    "word_count": 31,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 16
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_17",
+    "text": "Software\tDevelopment and Project Management Team. The performing organization is responsible for planning, designing, developing, testing, and implementing the ShelfLife platform. End Users: \nInventory Managers, Store Managers, Warehouse Staff, and Sales Personnel.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 265,
+    "word_count": 32,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 17
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_18",
+    "text": "re Managers, Warehouse Staff, and Sales Personnel. These users will interact with the system to monitor inventory, view expiry-risk levels, receive alerts, and take appropriate action on near-expiry products.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 208,
+    "word_count": 29,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 18
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_19",
+    "text": "d take appropriate action on near-expiry products. Other Stackholder:\nIT Support Team, Suppliers/Distributors, Finance Department, and Customers affected by product availability and pricing. Write details related to any two points that would be included in the Project Charter for your project.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 294,
+    "word_count": 41,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 19
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_20",
+    "text": "included in the Project Charter for your project. Which development approach is most suitable for your project? Justify.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 120,
+    "word_count": 18,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 20
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_21",
+    "text": "proach is most suitable for your project? Justify. ☐ Waterfall\t   ☐ Iterative\t   ☐ Adaptive\t    ☑ Hybrid\n\nJustification:\n\nThe Hybrid development approach is suitable because the major project requirements, scope, resources, and schedule can be planned in advance.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 263,
+    "word_count": 37,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 21
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_22",
+    "text": "resources, and schedule can be planned in advance. At the same time, features such as expiry-risk assessment, demand analysis, and recovery recommendations can be developed and improved through iterations based on testing and user feedback.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 240,
+    "word_count": 35,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 22
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_23",
+    "text": "ugh iterations based on testing and user feedback. Key reason for selecting Hybrid:\n\nIt provides the ShelfLife project with structured planning along with flexibility for improvement, which is useful for an intelligent inventory management system.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 247,
+    "word_count": 35,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 23
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_24",
+    "text": "ul for an intelligent inventory management system. State two benefits could be achieved after proposed implementation of the system compared to the initial concept stage.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 170,
+    "word_count": 25,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 24
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_25",
+    "text": "the system compared to the initial concept stage. Reduction in product waste and financial losses:\nShelfLife will identify near-expiry products before they expire and recommend suitable recovery actions.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 203,
+    "word_count": 28,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 25
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_26",
+    "text": "ey expire and recommend suitable recovery actions. Businesses can therefore sell, transfer, return/donate, or otherwise manage products in time instead of allowing them to become expired waste. This can reduce both product wastage and financial losses.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 252,
+    "word_count": 36,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 26
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_27",
+    "text": "reduce both product wastage and financial losses. Improved inventory management and decision-making:\n\nThe implemented system will provide inventory managers with timely information about expiry dates, quantities, risk levels, and recommended actions.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 250,
+    "word_count": 31,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 27
+    }
+  },
+  {
+    "chunk_id": "usr_1788617525_rec_28",
+    "text": "quantities, risk levels, and recommended actions. This will make it easier to prioritize high-risk products and take appropriate action instead of depending only on manual checking and estimation.",
+    "passage_id": "usr_1788617525",
+    "url": "",
+    "language": "en",
+    "char_length": 196,
+    "word_count": 28,
+    "metadata": {
+      "strategy": "sentence_recursive",
+      "chunk_idx": 28
+    }
+  }
+]
