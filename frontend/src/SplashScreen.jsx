@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Volume2, VolumeX, SkipForward } from 'lucide-react';
 
 export default function SplashScreen({ onComplete }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef(null);
   const hasFinishedRef = useRef(false);
 
@@ -26,8 +24,16 @@ export default function SplashScreen({ onComplete }) {
       handleFinish();
     };
 
+    const handleTimeUpdate = () => {
+      // Speed up the last section of the video (after 50% duration)
+      if (video.duration && video.currentTime > video.duration * 0.5) {
+        video.playbackRate = 2.2;
+      }
+    };
+
     video.addEventListener('ended', handleEnded);
     video.addEventListener('error', handleError);
+    video.addEventListener('timeupdate', handleTimeUpdate);
 
     // Attempt video playback
     video.play().catch((err) => {
@@ -39,24 +45,22 @@ export default function SplashScreen({ onComplete }) {
       if (!hasFinishedRef.current) {
         handleFinish();
       }
-    }, 12000);
+    }, 10000);
 
     return () => {
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('error', handleError);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
       clearTimeout(safetyTimer);
     };
   }, []);
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
   return (
-    <div className={`splash-overlay ${isFadingOut ? 'fade-out' : ''}`}>
+    <div
+      className={`splash-overlay ${isFadingOut ? 'fade-out' : ''}`}
+      onClick={handleFinish}
+      style={{ cursor: 'pointer' }}
+    >
       <video
         ref={videoRef}
         src="/wave_hq.mp4"
@@ -65,24 +69,7 @@ export default function SplashScreen({ onComplete }) {
         playsInline
         className="splash-video"
       />
-      <div className="splash-controls">
-        <button
-          type="button"
-          onClick={toggleMute}
-          className="splash-control-btn"
-          title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
-        >
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
-        <button
-          type="button"
-          onClick={handleFinish}
-          className="splash-control-btn skip-btn"
-          title="Skip Splash Screen"
-        >
-          Skip <SkipForward size={14} />
-        </button>
-      </div>
     </div>
   );
 }
+
