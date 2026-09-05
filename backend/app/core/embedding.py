@@ -17,8 +17,16 @@ class EmbeddingEngine:
 
     def _load_model(self):
         if self._model is None:
+            import os
+            os.environ["TORCH_NUM_THREADS"] = "1"
+            os.environ["OMP_NUM_THREADS"] = "1"
+            os.environ["MKL_NUM_THREADS"] = "1"
+            os.environ["TOKENIZERS_PARALLELISM"] = "false"
+            
             print(f"[*] Loading embedding transformer model: {self.model_name}...")
             start = time.perf_counter()
+            import torch
+            torch.set_num_threads(1)
             from sentence_transformers import SentenceTransformer
             self._model = SentenceTransformer(self.model_name)
             elapsed = (time.perf_counter() - start) * 1000
