@@ -4,8 +4,9 @@ import {
   Clock, RefreshCw, BarChart2,
   BookOpen, ChevronRight, MessageSquare, Volume2, Zap,
   Search, History, Database, Sliders, AlertCircle,
-  Bell, Calendar, Globe, Cpu, CheckCircle2
+  Globe
 } from 'lucide-react';
+import Marquee from 'react-fast-marquee';
 import AudioVisualizer from './AudioVisualizer';
 import VectorExplorer from './VectorExplorer';
 import QueryHistory from './QueryHistory';
@@ -28,8 +29,6 @@ export default function App() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [speechRecognizer, setSpeechRecognizer] = useState(null);
   const [voiceLanguage, setVoiceLanguage] = useState('hi-IN'); // Default to Hindi (hi-IN)
   const [textInput, setTextInput] = useState('');
   
@@ -76,7 +75,6 @@ export default function App() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setAudioStream(stream);
 
-      // Check if browser supports Web Speech API
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (SpeechRecognition) {
@@ -101,96 +99,34 @@ export default function App() {
         };
 
         recognition.start();
-        setSpeechRecognizer(recognition);
       }
 
-      // Record audio buffer with MediaRecorder for backend STT
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-      const audioChunks = [];
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunks.push(e.data);
-      };
-
-      recorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        await submitVoiceQuery(audioBlob);
-        stream.getTracks().forEach((track) => track.stop());
-        setAudioStream(null);
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
       setIsRecording(true);
     } catch (err) {
-      setErrorMessage('Microphone permission required for voice input: ' + err.message);
+      console.error('Microphone access error:', err);
+      setErrorMessage('Microphone access denied or unequipped. You can still type questions!');
     }
   };
 
-  // Stop Voice Recording
   const stopRecording = () => {
-    if (speechRecognizer) {
-      try { speechRecognizer.stop(); } catch (e) {}
-      setSpeechRecognizer(null);
+    if (audioStream) {
+      audioStream.getTracks().forEach((track) => track.stop());
+      setAudioStream(null);
     }
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-    }
-  };
+    setIsRecording(false);
 
-  // Submit Voice Audio to Backend
-  const submitVoiceQuery = async (audioBlob) => {
-    setLoading(true);
-    setLoadingText('Transcribing audio & executing RAG pipeline...');
-    setErrorMessage(null);
-
-    const spokenPrompt = liveTranscriptRef.current.trim() || textInput.trim();
-    
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'voice_query.webm');
-    formData.append('top_k', settings.top_k);
-    formData.append('score_threshold', settings.score_threshold);
-    if (spokenPrompt) {
-      formData.append('prompt', spokenPrompt);
-    }
-
-    try {
-      let res = await fetch(getApiUrl('/api/v1/voice-query'), {
-        method: 'POST',
-        body: formData
-      });
-
-      if (res.status === 502 || res.status === 504) {
-        setLoadingText('Waking up server instance... Retrying in 2 seconds...');
-        await new Promise((resolve) => setTimeout(resolve, 2500));
-        res = await fetch(getApiUrl('/api/v1/voice-query'), {
-          method: 'POST',
-          body: formData
-        });
-      }
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}: Failed to process voice query`);
-      const data = await res.json();
-      setPipelineResult(data);
-      if (data && (data.query || data.transcript)) {
-        setTextInput(data.query || data.transcript);
-      }
-    } catch (err) {
-      setErrorMessage('Error processing voice query: ' + err.message);
-    } finally {
-      setLoading(false);
-      setLoadingText('');
+    const finalQuery = textInput.trim() || liveTranscriptRef.current.trim();
+    if (finalQuery) {
+      executeQuery(finalQuery);
     }
   };
 
-  // Execute Text RAG Query
   const executeQuery = async (queryText) => {
     const cleanQuery = queryText.trim();
     if (!cleanQuery) return;
 
     setLoading(true);
-    setLoadingText('Searching MSMARCO-XI & generating grounded answer...');
+    setLoadingText('Searching dense vector space & generating grounded answer...');
     setErrorMessage(null);
 
     try {
@@ -252,482 +188,385 @@ export default function App() {
       {showSplash && (
         <SplashScreen onComplete={() => setShowSplash(false)} />
       )}
-      <div className={`app-wrapper ${!showSplash ? 'landing-reveal-wrapper' : ''}`}>
-        {/* Navbar Header */}
-      <header className="navbar">
-        <div className="brand">
-          <div className="brand-icon">
-            <Volume2 size={22} />
-          </div>
-          <div className="brand-text">
-            <span className="brand-name">EchoSeek</span>
-            <span className="brand-sub">Just ask. We’ll find it.</span>
-          </div>
-        </div>
-
-        {/* Tab Navigation Menu */}
-        <nav className="nav-tabs">
-          <button 
-            className={`nav-tab-btn ${activeTab === 'console' ? 'active' : ''}`}
-            onClick={() => setActiveTab('console')}
-          >
-            <Mic size={15} /> Voice Console
-          </button>
-          <button 
-            className={`nav-tab-btn ${activeTab === 'explorer' ? 'active' : ''}`}
-            onClick={() => setActiveTab('explorer')}
-          >
-            <Search size={15} /> Vector Explorer
-          </button>
-          <button 
-            className={`nav-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-            onClick={() => setActiveTab('history')}
-          >
-            <History size={15} /> History Log
-          </button>
-          <button 
-            className={`nav-tab-btn ${activeTab === 'datasets' ? 'active' : ''}`}
-            onClick={() => setActiveTab('datasets')}
-          >
-            <Database size={15} /> Datasets & Upload
-          </button>
-        </nav>
-
-        {/* Status Pills & Settings Button */}
-        <div className="nav-badges">
-          <span className={`status-pill ${health?.status === 'healthy' ? 'online' : ''}`}>
-            <span className="dot"></span>
-            {health?.status === 'healthy' ? 'System Ready' : 'Connecting...'}
-          </span>
-          <button className="settings-icon-btn" onClick={() => setIsSettingsOpen(true)} title="Pipeline Settings">
-            <Sliders size={18} />
-          </button>
-        </div>
-      </header>
-
-      {/* Global Error Banner */}
-      {errorMessage && (
-        <div className="global-error-banner">
-          <AlertCircle size={18} />
-          <span>{errorMessage}</span>
-          <button onClick={() => setErrorMessage(null)}>✕</button>
-        </div>
-      )}
-
-      {/* TAB CONTENT 1: VOICE RAG CONSOLE */}
-      {activeTab === 'console' && (
-        <main className="main-content">
-          <div className="hero-container">
-            <div className="hero-tag">
-              <Sparkles size={14} /> EchoSeek Voice Intelligence Engine
+      <div className="app-wrapper">
+        {/* Kinetic Header Navbar */}
+        <header className="navbar">
+          <div className="brand">
+            <div className="brand-icon">
+              <Volume2 size={24} />
             </div>
-            <h1 className="hero-heading">
-              Just ask. <span className="gradient-text">We’ll find it.</span>
-            </h1>
-            <p className="hero-subheading">
-              Speak naturally and watch your words transcribe live into the input box. Instant FAISS vector search & Gemini 3.5 Flash RAG answers.
-            </p>
+            <div className="brand-text">
+              <span className="brand-name">EchoSeek</span>
+              <span className="brand-sub">Kinetic Voice & Vector RAG</span>
+            </div>
           </div>
 
-          {/* Central Voice & Text Input Console */}
-          <div className={`console-card ${isRecording ? 'active-recording' : ''}`}>
-            <div className="console-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span className="console-title">
-                <MessageSquare size={16} color="var(--accent-cyan)" /> Voice Dictation Console
-              </span>
+          {/* Navigation Tabs */}
+          <nav className="nav-tabs">
+            <button 
+              className={`nav-tab ${activeTab === 'console' ? 'active' : ''}`}
+              onClick={() => setActiveTab('console')}
+            >
+              <Mic size={16} /> Voice Console
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'explorer' ? 'active' : ''}`}
+              onClick={() => setActiveTab('explorer')}
+            >
+              <Search size={16} /> Vector Explorer
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
+              onClick={() => setActiveTab('history')}
+            >
+              <History size={16} /> History Log
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'datasets' ? 'active' : ''}`}
+              onClick={() => setActiveTab('datasets')}
+            >
+              <Database size={16} /> Datasets & Upload
+            </button>
+          </nav>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div className="voice-lang-select-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Voice Lang:</span>
+          <div className="nav-actions">
+            <div className="system-badge">
+              <span className="badge-pulse"></span>
+              {health?.status === 'healthy' ? 'SYSTEM READY' : 'CONNECTING'}
+            </div>
+            <button className="icon-btn-brutalist" onClick={() => setIsSettingsOpen(true)} title="Pipeline Settings">
+              <Sliders size={18} />
+            </button>
+          </div>
+        </header>
+
+        {/* Kinetic Marquee Stats Banner */}
+        <div className="kinetic-marquee-banner">
+          <Marquee speed={75} gradient={false}>
+            <div className="marquee-item">
+              SARVAM AI INDIC STT <span className="marquee-divider">/</span>
+              FAISS 384-D DENSE INDEXING <span className="marquee-divider">/</span>
+              GEMINI 3.5 FLASH GROUNDED RAG <span className="marquee-divider">/</span>
+              SUB-200MS PIPELINE EXECUTION <span className="marquee-divider">/</span>
+              UNIVERSAL DOCUMENT INGESTION (.PDF, .CSV, .DOCX, .XLSX) <span className="marquee-divider">/</span>
+            </div>
+          </Marquee>
+        </div>
+
+        {/* Global Error Banner */}
+        {errorMessage && (
+          <div style={{
+            backgroundColor: '#ff3344',
+            color: '#fff',
+            padding: '1rem 3rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            textTransform: 'uppercase'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <AlertCircle size={20} />
+              <span>{errorMessage}</span>
+            </div>
+            <button 
+              onClick={() => setErrorMessage(null)}
+              style={{ background: 'none', border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '1.2rem' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* TAB CONTENT 1: VOICE CONSOLE */}
+        {activeTab === 'console' && (
+          <main style={{ padding: '3rem 3rem 5rem 3rem' }}>
+            {/* Kinetic Hero */}
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <h1 className="kinetic-hero-title">
+                JUST ASK. <span className="highlight">WE'LL FIND IT.</span>
+              </h1>
+              <p className="kinetic-subheading" style={{ marginTop: '1rem', maxWidth: '800px', marginLeft: 'auto', marginRight: 'auto' }}>
+                Speak naturally or type your question. Live multi-lingual dictation with grounded FAISS dense vector search.
+              </p>
+            </div>
+
+            {/* Main Dictation Hero Console Container */}
+            <div className="dictation-hero-container">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <span className="kinetic-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <MessageSquare size={16} color="var(--accent-yellow)" /> VOICE DICTATION CONSOLE
+                </span>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <select 
                     value={voiceLanguage} 
                     onChange={(e) => setVoiceLanguage(e.target.value)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      color: 'var(--text-primary)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      borderRadius: '6px',
-                      padding: '0.25rem 0.5rem',
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                      outline: 'none'
-                    }}
+                    className="kinetic-select"
+                    style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
                   >
-                    <option value="hi-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Hindi (हिन्दी)</option>
-                    <option value="en-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Indian English</option>
-                    <option value="en-US" style={{ background: '#1e1e2d', color: '#fff' }}>🇺🇸 US English</option>
-                    <option value="mr-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Marathi (मराठी)</option>
-                    <option value="ta-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Tamil (தமிழ்)</option>
-                    <option value="te-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Telugu (తెలుగు)</option>
-                    <option value="bn-IN" style={{ background: '#1e1e2d', color: '#fff' }}>🇮🇳 Bengali (বাংলা)</option>
+                    <option value="hi-IN">🇮🇳 HINDI (हिन्दी)</option>
+                    <option value="en-IN">🇮🇳 INDIAN ENGLISH</option>
+                    <option value="en-US">🇺🇸 US ENGLISH</option>
+                    <option value="mr-IN">🇮🇳 MARATHI (मराठी)</option>
+                    <option value="ta-IN">🇮🇳 TAMIL (தமிழ்)</option>
+                    <option value="te-IN">🇮🇳 TELUGU (తెలుగు)</option>
+                    <option value="bn-IN">🇮🇳 BENGALI (বাংলা)</option>
                   </select>
+
+                  {isRecording && (
+                    <span className="kinetic-label" style={{ color: '#ff3344' }}>
+                      LISTENING... ({recordingTime}S)
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Massive Brutalist Microphone Stage */}
+              <div className="mic-section-wrapper">
+                <button
+                  type="button"
+                  className={`mic-button-kinetic ${isRecording ? 'recording' : ''}`}
+                  onClick={isRecording ? stopRecording : startRecording}
+                  title={isRecording ? 'Stop & Submit' : 'Click to Speak'}
+                >
+                  {isRecording ? <MicOff size={54} /> : <Mic size={54} />}
+                </button>
+
+                <div style={{ textAlign: 'center', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
+                  {isRecording ? (
+                    <span style={{ color: '#ff3344' }}>
+                      SPEAK NOW IN {voiceLanguage === 'hi-IN' ? 'HINDI' : 'YOUR CHOSEN LANGUAGE'}... WORDS TYPE LIVE BELOW!
+                    </span>
+                  ) : loading ? (
+                    <span style={{ color: 'var(--accent-yellow)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <RefreshCw size={18} className="spin-icon" /> {loadingText}
+                    </span>
+                  ) : (
+                    <span>TAP MICROPHONE TO START DICTATION</span>
+                  )}
                 </div>
 
-                {isRecording && (
-                  <span className="recording-timer">
-                    <span className="red-pulse"></span> Listening... ({recordingTime}s)
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="mic-stage">
-              <button
-                type="button"
-                className={`action-mic-button ${isRecording ? 'is-recording' : ''}`}
-                onClick={isRecording ? stopRecording : startRecording}
-                title={isRecording ? 'Click to Stop Speaking & Submit' : 'Click to Speak Question'}
-              >
-                {isRecording ? <MicOff size={38} /> : <Mic size={38} />}
-              </button>
-
-              <div className="mic-hint-text">
-                {isRecording ? (
-                  <span style={{ color: '#ef4444', fontWeight: 600 }}>
-                    Speak your question in {voiceLanguage === 'hi-IN' ? 'Hindi' : 'your chosen language'}... Words are typing live below! Tap mic again to submit.
-                  </span>
-                ) : loading ? (
-                  <span style={{ color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <RefreshCw size={16} className="spin-icon" /> {loadingText}
-                  </span>
-                ) : (
-                  <span>Tap microphone to start speaking your question</span>
-                )}
+                <AudioVisualizer stream={audioStream} isRecording={isRecording} />
               </div>
 
-              <AudioVisualizer stream={audioStream} isRecording={isRecording} />
-            </div>
-
-            {/* Form Input for Real-time Speech-to-Text Typing & Manual Entry */}
-            <form className="console-form" onSubmit={handleTextSubmit}>
-              <input
-                type="text"
-                className="console-input"
-                placeholder="Spoken words type live here... Or type a question in Hindi / English"
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-              />
-              <button 
-                type="submit" 
-                className="console-submit-btn" 
-                disabled={loading || !textInput.trim()}
-              >
-                Ask EchoSeek <ChevronRight size={18} />
-              </button>
-            </form>
-
-            {/* Preset Sample Prompts */}
-            <div className="preset-container">
-              <span className="preset-label">Try sample queries:</span>
-              <div className="preset-pills">
+              {/* Input Form */}
+              <form className="dictation-input-row" onSubmit={handleTextSubmit}>
+                <input
+                  type="text"
+                  className="dictation-text-input"
+                  placeholder="Spoken words type live here... Or type a question in Hindi / English"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                />
                 <button 
-                  type="button" 
-                  className="preset-pill" 
+                  type="submit" 
+                  className="dictation-submit-btn"
+                  disabled={loading || !textInput.trim()}
+                >
+                  ASK ECHOSEEK <ChevronRight size={20} />
+                </button>
+              </form>
+
+              {/* Sample Prompts */}
+              <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <span className="kinetic-label">TRY SAMPLES:</span>
+                <button 
+                  type="button"
+                  className="kinetic-btn kinetic-btn-outline"
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
                   onClick={() => handleSampleClick("गोवा भारत के किस तट पर स्थित है?")}
                 >
                   🇮🇳 गोवा किस तट पर है?
                 </button>
                 <button 
-                  type="button" 
-                  className="preset-pill" 
+                  type="button"
+                  className="kinetic-btn kinetic-btn-outline"
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
                   onClick={() => handleSampleClick("Sarvam AI किस लिए प्रसिद्ध है?")}
                 >
                   🇮🇳 Sarvam AI क्या है?
                 </button>
                 <button 
-                  type="button" 
-                  className="preset-pill" 
-                  onClick={() => handleSampleClick("वेक्टर एम्बेडिंग सेमांटिक सर्च में कैसे काम करते हैं?")}
-                >
-                  🇮🇳 वेक्टर एम्बेडिंग?
-                </button>
-                <button 
-                  type="button" 
-                  className="preset-pill" 
+                  type="button"
+                  className="kinetic-btn kinetic-btn-outline"
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
                   onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
                 >
                   What is RAG?
                 </button>
                 <button 
-                  type="button" 
-                  className="preset-pill" 
-                  onClick={() => handleSampleClick("where is Goa located in India")}
+                  type="button"
+                  className="kinetic-btn kinetic-btn-outline"
+                  style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
+                  onClick={() => handleSampleClick("Where is Goa located in India?")}
                 >
                   Where is Goa located?
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Quick Actions Section */}
-          <section className="quick-actions-section">
-            <div className="section-tag-header">
-              <h2 className="section-tag-title">
-                <Zap size={14} /> Quick Actions
-              </h2>
-              <span className="section-tag-sub">tap to execute</span>
-            </div>
-            <div className="quick-actions-grid">
-              <div 
-                className="quick-action-card"
-                onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
-              >
-                <div className="quick-action-header">
-                  <BookOpen size={16} className="quick-action-icon" />
-                  <span className="quick-action-title">Explain RAG Framework</span>
-                </div>
-                <p className="quick-action-desc">Query knowledge base for architecture & vector search overview</p>
-              </div>
-
-              <div 
-                className="quick-action-card"
-                onClick={() => handleSampleClick("Where is Goa located in India?")}
-              >
-                <div className="quick-action-header">
-                  <Globe size={16} className="quick-action-icon" />
-                  <span className="quick-action-title">Geographical Query</span>
-                </div>
-                <p className="quick-action-desc">Inspect grounded state facts & MSMARCO attribution</p>
-              </div>
-
-              <div 
-                className="quick-action-card"
-                onClick={() => handleSampleClick("Sarvam AI किस लिए प्रसिद्ध है?")}
-              >
-                <div className="quick-action-header">
-                  <MessageSquare size={16} className="quick-action-icon" />
-                  <span className="quick-action-title">Indic Voice Translate</span>
-                </div>
-                <p className="quick-action-desc">Test multi-lingual STT dictation in Hindi & English</p>
-              </div>
-
-              <div 
-                className="quick-action-card"
-                onClick={() => setActiveTab('explorer')}
-              >
-                <div className="quick-action-header">
-                  <Search size={16} className="quick-action-icon" />
-                  <span className="quick-action-title">Vector Search Explorer</span>
-                </div>
-                <p className="quick-action-desc">Inspect FAISS 384-D dense embeddings & similarity ranks</p>
-              </div>
-            </div>
-          </section>
-
-          {/* Recent Activity Section */}
-          <section className="recent-activity-section">
-            <div className="section-tag-header">
-              <h2 className="section-tag-title">
-                <Clock size={14} /> Recent Activity
-              </h2>
-              <button 
-                type="button" 
-                onClick={() => setActiveTab('history')} 
-                style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '0.8rem', cursor: 'pointer' }}
-              >
-                View full audit log →
-              </button>
-            </div>
-            <div className="recent-activity-list">
-              <div className="recent-activity-item">
-                <div className="recent-activity-main">
-                  <div className="recent-activity-icon-badge">
-                    <Mic size={16} />
+            {/* Grounded Response Panel */}
+            {pipelineResult && (
+              <div className="grounded-response-box">
+                <div className="grounded-header">
+                  <div className="grounded-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Sparkles size={22} color="var(--accent-yellow)" /> GROUNDED ANSWER
                   </div>
-                  <div>
-                    <div className="recent-activity-query">"What is Retrieval Augmented Generation?"</div>
-                    <div className="recent-activity-desc">Grounded answer retrieved via FAISS e5-small index</div>
-                  </div>
-                </div>
-                <span className="status-tag-completed">Completed</span>
-              </div>
-
-              <div className="recent-activity-item">
-                <div className="recent-activity-main">
-                  <div className="recent-activity-icon-badge">
-                    <Database size={16} />
-                  </div>
-                  <div>
-                    <div className="recent-activity-query">"Sarvam AI speech-to-text latency optimization"</div>
-                    <div className="recent-activity-desc">Sub-200ms pipeline execution benchmarked</div>
-                  </div>
-                </div>
-                <span className="status-tag-completed">Completed</span>
-              </div>
-            </div>
-          </section>
-
-          {/* Results Showcase Section */}
-          {pipelineResult && (
-            <div className="results-container">
-              {/* Left Box: Question, Answer, Sources */}
-              <div className="response-column">
-                <div className="result-card transcript-card">
-                  <div className="card-label">Recognized Question</div>
-                  <div className="query-display-text">
-                    "{pipelineResult.query || pipelineResult.transcript || textInput}"
-                  </div>
-                </div>
-
-                <div className="result-card answer-card">
-                  <div className="card-top-bar">
-                    <span className="card-heading">
-                      <Sparkles size={18} color="var(--accent-cyan)" /> Grounded Answer
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <span style={{
+                      backgroundColor: 'var(--accent-yellow)',
+                      color: 'var(--accent-fg)',
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      padding: '0.3rem 0.8rem',
+                      textTransform: 'uppercase'
+                    }}>
+                      CONFIDENCE: {confidencePct}%
                     </span>
-                    <div className="status-badge-group">
-                      <span className={`guardrail-badge ${pipelineResult.is_grounded ? 'grounded' : 'unverified'}`}>
-                        <ShieldCheck size={13} /> {pipelineResult.guardrail_action || 'PASSED'}
-                      </span>
-                      <span className="confidence-badge">
-                        Confidence: {confidencePct}%
-                      </span>
-                    </div>
+                    <span style={{
+                      border: '2px solid var(--accent-yellow)',
+                      color: 'var(--accent-yellow)',
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      padding: '0.3rem 0.8rem',
+                      textTransform: 'uppercase'
+                    }}>
+                      TOTAL: {totalMs.toFixed(2)} MS
+                    </span>
                   </div>
+                </div>
 
-                  <div className="answer-text-content">
-                    {pipelineResult.answer}
-                  </div>
+                <div className="grounded-content">
+                  {pipelineResult.answer}
+                </div>
 
-                  {pipelineResult.sources && pipelineResult.sources.length > 0 && (
-                    <div className="sources-section">
-                      <div className="sources-title">
-                        <BookOpen size={14} /> Knowledge Sources Attributed ({pipelineResult.sources.length})
-                      </div>
-                      <div className="sources-grid">
-                        {pipelineResult.sources.map((src, i) => (
-                          <div key={i} className="source-card">
-                            <div className="source-id-badge">Passage {src.passage_id}</div>
-                            <div className="source-dataset-name">
-                              AI4Bharat MSMARCO-XI Grounded Entry
-                            </div>
-                            {src.url && (
-                              <a href={src.url} target="_blank" rel="noopener noreferrer" className="source-link">
-                                {src.url}
-                              </a>
-                            )}
+                {pipelineResult.sources && pipelineResult.sources.length > 0 && (
+                  <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '2px solid var(--border-zinc)' }}>
+                    <span className="kinetic-label">ATTRIBUTED SOURCES ({pipelineResult.sources.length}):</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                      {pipelineResult.sources.map((src, i) => (
+                        <div key={i} className="kinetic-card" style={{ padding: '1rem' }}>
+                          <div style={{ color: 'var(--accent-yellow)', fontWeight: 700, fontSize: '0.8rem' }}>
+                            PASSAGE {src.passage_id}
                           </div>
-                        ))}
-                      </div>
+                          <div style={{ fontSize: '0.85rem', color: 'var(--muted-fg)', marginTop: '0.25rem' }}>
+                            MSMARCO Grounded Context Entry
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Quick Actions Section */}
+            <section style={{ marginTop: '4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+                <h2 className="kinetic-section-heading">QUICK ACTIONS</h2>
+                <span className="kinetic-label">CLICK TO EXECUTE PIPELINE</span>
+              </div>
+              <div className="quick-actions-grid">
+                <div 
+                  className="kinetic-card kinetic-card-hover"
+                  onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
+                >
+                  <div className="kinetic-num-bg">01</div>
+                  <div className="kinetic-card-title">EXPLAIN RAG FRAMEWORK</div>
+                  <div className="kinetic-card-desc">Query knowledge base for architecture & vector search overview</div>
+                </div>
+
+                <div 
+                  className="kinetic-card kinetic-card-hover"
+                  onClick={() => handleSampleClick("Where is Goa located in India?")}
+                >
+                  <div className="kinetic-num-bg">02</div>
+                  <div className="kinetic-card-title">GEOGRAPHICAL QUERY</div>
+                  <div className="kinetic-card-desc">Inspect grounded state facts & MSMARCO attribution</div>
+                </div>
+
+                <div 
+                  className="kinetic-card kinetic-card-hover"
+                  onClick={() => handleSampleClick("Sarvam AI किस लिए प्रसिद्ध है?")}
+                >
+                  <div className="kinetic-num-bg">03</div>
+                  <div className="kinetic-card-title">INDIC VOICE TRANSLATE</div>
+                  <div className="kinetic-card-desc">Test multi-lingual STT dictation in Hindi & English</div>
+                </div>
+
+                <div 
+                  className="kinetic-card kinetic-card-hover"
+                  onClick={() => setActiveTab('explorer')}
+                >
+                  <div className="kinetic-num-bg">04</div>
+                  <div className="kinetic-card-title">VECTOR EXPLORER</div>
+                  <div className="kinetic-card-desc">Inspect FAISS 384-D dense embeddings & similarity ranks</div>
                 </div>
               </div>
+            </section>
 
-              {/* Right Box: Real-Time Latency Metrics */}
-              <div className="metrics-column">
-                <div className="result-card metrics-card">
-                  <div className="card-heading" style={{ marginBottom: '1.25rem' }}>
-                    <Clock size={18} color="var(--accent-cyan)" /> Latency Analytics
-                  </div>
-
-                  <div className="total-latency-banner">
-                    <div className="total-label">TOTAL PIPELINE TIME</div>
-                    <div className="total-value">
-                      {totalMs.toFixed(2)} <span className="unit">ms</span>
+            {/* Recent Activity Section */}
+            <section style={{ marginTop: '4rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+                <h2 className="kinetic-section-heading">RECENT AUDIT LOG</h2>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveTab('history')} 
+                  className="kinetic-label"
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-yellow)', cursor: 'pointer' }}
+                >
+                  VIEW FULL AUDIT LOG →
+                </button>
+              </div>
+              <div className="recent-activity-list">
+                <div className="recent-activity-item">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
+                      <Mic size={18} />
                     </div>
-                    <div className="target-status">
-                      {totalMs < 200 ? '⚡ Target < 200 ms Achieved!' : 'Sub-Second Response Delivered'}
-                    </div>
-                  </div>
-
-                  <div className="stage-metrics">
-                    {sttMs > 0 && (
-                      <>
-                        <div className="stage-row">
-                          <span className="stage-name">STT (Sarvam AI)</span>
-                          <span className="stage-time">{sttMs.toFixed(2)} ms</span>
-                        </div>
-                        <div className="bar-track">
-                          <div className="bar-fill" style={{ width: `${Math.min((sttMs / 100) * 100, 100)}%` }}></div>
-                        </div>
-                      </>
-                    )}
-
-                    <div className="stage-row">
-                      <span className="stage-name">Embedding (`e5-small`)</span>
-                      <span className="stage-time">{embMs.toFixed(2)} ms</span>
-                    </div>
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{ width: `${Math.min((embMs / 50) * 100, 100)}%` }}></div>
-                    </div>
-
-                    <div className="stage-row">
-                      <span className="stage-name">FAISS Vector Search</span>
-                      <span className="stage-time">{searchMs.toFixed(3)} ms</span>
-                    </div>
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{ width: '15%' }}></div>
-                    </div>
-
-                    <div className="stage-row">
-                      <span className="stage-name">LLM Generation ({settings.model_name})</span>
-                      <span className="stage-time">{llmMs.toFixed(2)} ms</span>
-                    </div>
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{ width: `${Math.min((llmMs / 300) * 100, 100)}%` }}></div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase' }}>"What is Retrieval Augmented Generation?"</div>
+                      <div style={{ color: 'var(--muted-fg)', fontSize: '0.85rem' }}>Grounded answer retrieved via FAISS e5-small index</div>
                     </div>
                   </div>
+                  <span style={{ border: '1px solid var(--accent-yellow)', color: 'var(--accent-yellow)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
                 </div>
 
-                <div className="result-card analytics-table-card">
-                  <div className="card-heading" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>
-                    <BarChart2 size={16} color="var(--accent-purple)" /> Empirical System Benchmarks
+                <div className="recent-activity-item">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
+                      <Database size={18} />
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase' }}>"Sarvam AI speech-to-text latency optimization"</div>
+                      <div style={{ color: 'var(--muted-fg)', fontSize: '0.85rem' }}>Sub-200ms pipeline execution benchmarked</div>
+                    </div>
                   </div>
-                  <table className="mini-table">
-                    <thead>
-                      <tr>
-                        <th>Metric</th>
-                        <th>P50</th>
-                        <th>P70</th>
-                        <th>P100</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>FAISS Search</td>
-                        <td>0.03ms</td>
-                        <td>0.03ms</td>
-                        <td>0.09ms</td>
-                      </tr>
-                      <tr>
-                        <td>Embedding</td>
-                        <td>22.4ms</td>
-                        <td>23.2ms</td>
-                        <td>29.2ms</td>
-                      </tr>
-                      <tr>
-                        <td>Total Pipeline</td>
-                        <td className="highlight-val">145ms</td>
-                        <td className="highlight-val">172ms</td>
-                        <td className="highlight-val">198ms</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <span style={{ border: '1px solid var(--accent-yellow)', color: 'var(--accent-yellow)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
                 </div>
               </div>
-            </div>
-          )}
-        </main>
-      )}
+            </section>
+          </main>
+        )}
 
-      {/* TAB CONTENT 2: VECTOR EXPLORER */}
-      {activeTab === 'explorer' && <VectorExplorer settings={settings} />}
+        {/* TAB CONTENT 2: VECTOR EXPLORER */}
+        {activeTab === 'explorer' && <VectorExplorer settings={settings} />}
 
-      {/* TAB CONTENT 3: QUERY HISTORY LOGS */}
-      {activeTab === 'history' && <QueryHistory />}
+        {/* TAB CONTENT 3: QUERY HISTORY LOGS */}
+        {activeTab === 'history' && <QueryHistory />}
 
-      {/* TAB CONTENT 4: DATASETS & INGESTION */}
-      {activeTab === 'datasets' && <DatasetIngestion />}
+        {/* TAB CONTENT 4: DATASETS & INGESTION */}
+        {activeTab === 'datasets' && <DatasetIngestion />}
 
-      {/* SETTINGS MODAL */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onUpdateSettings={setSettings}
-      />
-    </div>
+        {/* SETTINGS MODAL */}
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          settings={settings}
+          onUpdateSettings={setSettings}
+        />
+      </div>
     </>
   );
 }
-

@@ -39,48 +39,47 @@ export default function VectorExplorer({ settings }) {
   };
 
   return (
-    <div className="tab-container">
-      <div className="section-header">
+    <div style={{ padding: '3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
-          <h2 className="section-title">
-            <Search size={22} color="var(--accent-cyan)" /> Vector Search Explorer
-          </h2>
-          <p className="section-subtitle">
-            Perform direct FAISS dense embedding similarity queries and inspect raw vector score rankings.
+          <h2 className="kinetic-section-heading">VECTOR EXPLORER</h2>
+          <p className="kinetic-subheading" style={{ marginTop: '0.5rem' }}>
+            Perform direct FAISS 384-D dense similarity search and inspect cosine rankings.
           </p>
         </div>
-        <div className="badge-pill">
-          <Database size={13} /> FAISS IndexFlatIP (384-dim)
-        </div>
+        <span className="kinetic-label" style={{ border: '2px solid var(--border-zinc)', padding: '0.5rem 1rem' }}>
+          FAISS INDEXFLATIP (384-D)
+        </span>
       </div>
 
-      <div className="explorer-card">
-        <form onSubmit={handleSearch} className="explorer-form">
-          <div className="input-group flex-1">
-            <Search size={18} className="search-icon" />
+      <div className="kinetic-card" style={{ marginBottom: '2rem' }}>
+        <form onSubmit={handleSearch}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <span className="kinetic-label">QUERY INPUT:</span>
             <input
               type="text"
-              className="explorer-input"
-              placeholder="Enter search query to test FAISS cosine similarity..."
+              className="kinetic-input"
+              placeholder="Enter query to compute cosine similarity..."
               value={queryText}
               onChange={(e) => setQueryText(e.target.value)}
             />
           </div>
 
-          <div className="controls-row">
-            <div className="control-item">
-              <label><Sliders size={13} /> Top K: {topK}</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', alignItems: 'center' }}>
+            <div>
+              <span className="kinetic-label">TOP K: {topK}</span>
               <input
                 type="range"
                 min="1"
                 max="10"
                 value={topK}
                 onChange={(e) => setTopK(e.target.value)}
+                style={{ width: '100%', accentColor: 'var(--accent-yellow)', marginTop: '0.5rem' }}
               />
             </div>
 
-            <div className="control-item">
-              <label><Hash size={13} /> Threshold: {threshold}</label>
+            <div>
+              <span className="kinetic-label">THRESHOLD: {threshold}</span>
               <input
                 type="range"
                 min="0.05"
@@ -88,48 +87,53 @@ export default function VectorExplorer({ settings }) {
                 step="0.05"
                 value={threshold}
                 onChange={(e) => setThreshold(e.target.value)}
+                style={{ width: '100%', accentColor: 'var(--accent-yellow)', marginTop: '0.5rem' }}
               />
             </div>
 
-            <button type="submit" className="action-btn primary" disabled={loading}>
-              {loading ? <RefreshCw size={16} className="spin-icon" /> : <Zap size={16} />}
-              Search Vectors
+            <button type="submit" className="kinetic-btn kinetic-btn-primary" disabled={loading}>
+              {loading ? <RefreshCw size={18} className="spin-icon" /> : <Zap size={18} />}
+              SEARCH VECTORS
             </button>
           </div>
         </form>
       </div>
 
-      {error && <div className="error-banner">⚠️ {error}</div>}
+      {error && (
+        <div style={{ backgroundColor: '#ff3344', color: '#fff', padding: '1rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2rem' }}>
+          ⚠️ {error}
+        </div>
+      )}
 
       {searchResult && (
-        <div className="results-wrapper">
-          <div className="metrics-bar">
-            <span>Query: <strong>"{searchResult.query}"</strong></span>
-            <span>Hits Found: <strong>{searchResult.total_hits}</strong></span>
-            <span>Search Latency: <strong className="highlight-val">{searchResult.search_latency_ms} ms</strong></span>
+        <div>
+          <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', backgroundColor: 'var(--muted-bg)', padding: '1rem 2rem', textTransform: 'uppercase', fontWeight: 700 }}>
+            <span>QUERY: <strong style={{ color: 'var(--accent-yellow)' }}>"{searchResult.query}"</strong></span>
+            <span>HITS: <strong style={{ color: 'var(--accent-yellow)' }}>{searchResult.total_hits}</strong></span>
+            <span>LATENCY: <strong style={{ color: 'var(--accent-yellow)' }}>{searchResult.search_latency_ms} MS</strong></span>
           </div>
 
-          <div className="hits-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
             {searchResult.hits.length === 0 ? (
-              <div className="empty-state">
-                No matching passages found above score threshold {threshold}. Try lowering threshold or changing query.
+              <div className="kinetic-card" style={{ textAlign: 'center', color: 'var(--muted-fg)' }}>
+                NO MATCHING PASSAGES ABOVE THRESHOLD {threshold}. TRY LOWERING THRESHOLD.
               </div>
             ) : (
               searchResult.hits.map((hit) => (
-                <div key={hit.rank} className="hit-card">
-                  <div className="hit-card-header">
-                    <span className="hit-rank">#Rank {hit.rank}</span>
-                    <span className="hit-score">Cosine Similarity: <strong>{(hit.score * 100).toFixed(1)}%</strong> ({hit.score})</span>
+                <div key={hit.rank} className="kinetic-card kinetic-card-hover">
+                  <div className="kinetic-num-bg">0{hit.rank}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>RANK #{hit.rank}</span>
+                    <span className="kinetic-label">SCORE: {(hit.score * 100).toFixed(1)}%</span>
                   </div>
-                  <div className="hit-body">
-                    <FileText size={15} color="var(--accent-cyan)" style={{ float: 'left', marginRight: '8px', marginTop: '3px' }} />
-                    <p className="hit-text">{hit.text}</p>
-                  </div>
-                  <div className="hit-footer">
-                    <span className="passage-tag">Passage ID: {hit.passage_id}</span>
+                  <p className="kinetic-card-desc" style={{ marginBottom: '1.5rem' }}>
+                    "{hit.text}"
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-zinc)', paddingTop: '0.75rem' }}>
+                    <span className="kinetic-label">PASSAGE #{hit.passage_id}</span>
                     {hit.url && (
-                      <a href={hit.url} target="_blank" rel="noopener noreferrer" className="hit-link">
-                        Source Link <ArrowUpRight size={13} />
+                      <a href={hit.url} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                        LINK ↗
                       </a>
                     )}
                   </div>

@@ -69,6 +69,26 @@ export default function SplashScreen({ onComplete }) {
         playsInline
         className="splash-video"
       />
+      <div style={{
+        position: 'absolute',
+        bottom: '3rem',
+        left: '3rem',
+        zIndex: 10,
+        pointerEvents: 'none'
+      }}>
+        <div style={{
+          fontSize: '0.9rem',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.15em',
+          color: '#DFE104',
+          backgroundColor: '#09090B',
+          padding: '0.5rem 1rem',
+          border: '2px solid #DFE104'
+        }}>
+          EchoSeek — Kinetic Intelligence // Click Anywhere to Skip
+        </div>
+      </div>
     </div>
   );
 }

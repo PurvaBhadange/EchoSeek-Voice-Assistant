@@ -36,89 +36,73 @@ export default function QueryHistory() {
   };
 
   return (
-    <div className="tab-container">
-      <div className="section-header">
+    <div style={{ padding: '3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
-          <h2 className="section-title">
-            <History size={22} color="var(--accent-cyan)" /> Query Session Audit Logs
-          </h2>
-          <p className="section-subtitle">
-            Historical audit log of voice & text queries, grounding verification status, and per-stage latency breakdown.
+          <h2 className="kinetic-section-heading">QUERY AUDIT LOG</h2>
+          <p className="kinetic-subheading" style={{ marginTop: '0.5rem' }}>
+            Historical record of voice & text dictation, grounding verification, and execution latency.
           </p>
         </div>
-        <div className="action-button-group">
-          <button onClick={fetchHistory} className="action-btn secondary">
-            <RefreshCw size={14} className={loading ? 'spin-icon' : ''} /> Refresh
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button onClick={fetchHistory} className="kinetic-btn kinetic-btn-outline" style={{ padding: '0.5rem 1rem' }}>
+            <RefreshCw size={16} className={loading ? 'spin-icon' : ''} /> REFRESH
           </button>
           {historyData.length > 0 && (
-            <button onClick={handleClearHistory} className="action-btn danger">
-              <Trash2 size={14} /> Clear Logs
+            <button onClick={handleClearHistory} className="kinetic-btn kinetic-btn-outline" style={{ padding: '0.5rem 1rem', borderColor: '#ff3344', color: '#ff3344' }}>
+              <Trash2 size={16} /> CLEAR LOGS
             </button>
           )}
         </div>
       </div>
 
       {loading ? (
-        <div className="loading-container">
-          <RefreshCw size={24} className="spin-icon" color="var(--accent-cyan)" />
-          <p>Loading query history logs...</p>
+        <div className="kinetic-card" style={{ textAlign: 'center', padding: '4rem' }}>
+          <RefreshCw size={32} className="spin-icon" color="var(--accent-yellow)" style={{ marginBottom: '1rem' }} />
+          <div className="kinetic-label">LOADING AUDIT LOGS...</div>
         </div>
       ) : historyData.length === 0 ? (
-        <div className="empty-state">
-          <History size={36} color="var(--text-muted)" style={{ marginBottom: '0.75rem' }} />
-          <p>No queries recorded in this session yet.</p>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Ask a question via voice or text in the <strong>Voice RAG Console</strong> tab to generate audit logs.
-          </span>
+        <div className="kinetic-card" style={{ textAlign: 'center', padding: '4rem' }}>
+          <History size={48} color="var(--muted-fg)" style={{ marginBottom: '1rem' }} />
+          <div className="kinetic-card-title">NO AUDIT LOGS RECORDED</div>
+          <p className="kinetic-card-desc">Submit queries in the Voice Console to populate execution benchmarks.</p>
         </div>
       ) : (
-        <div className="history-table-container">
-          <table className="history-table">
-            <thead>
-              <tr>
-                <th>Time & Type</th>
-                <th>Query</th>
-                <th>Status & Grounding</th>
-                <th>Latency Breakdown</th>
-                <th>Total Latency</th>
-              </tr>
-            </thead>
-            <tbody>
-              {historyData.map((item) => (
-                <tr key={item.id}>
-                  <td className="time-col">
-                    <span className="type-badge">
-                      {item.type === 'voice' ? <Mic size={12} /> : <MessageSquare size={12} />}
-                      {item.type === 'voice' ? 'Voice' : 'Text'}
-                    </span>
-                    <div className="timestamp">{item.timestamp}</div>
-                  </td>
-                  <td className="query-col">
-                    <div className="query-text">"{item.query}"</div>
-                    <div className="answer-snippet">{item.answer}</div>
-                  </td>
-                  <td className="status-col">
-                    <span className={`status-tag ${item.is_grounded ? 'grounded' : 'unverified'}`}>
-                      {item.is_grounded ? <CheckCircle size={12} /> : <AlertTriangle size={12} />}
-                      {item.guardrail_action || (item.is_grounded ? 'PASSED' : 'UNGROUNDED')}
-                    </span>
-                    <div className="confidence-val">Confidence: {((item.confidence || 0.95) * 100).toFixed(0)}%</div>
-                  </td>
-                  <td className="latency-breakdown-col">
-                    <div className="micro-timing">STT: {(item.latency?.stt_ms || 0).toFixed(1)}ms</div>
-                    <div className="micro-timing">Emb: {(item.latency?.embedding_ms || 0).toFixed(1)}ms</div>
-                    <div className="micro-timing">FAISS: {(item.latency?.vector_search_ms || 0).toFixed(2)}ms</div>
-                    <div className="micro-timing">LLM: {(item.latency?.llm_ms || 0).toFixed(1)}ms</div>
-                  </td>
-                  <td className="total-col">
-                    <span className="total-badge">
-                      <Clock size={12} /> {(item.latency?.total_ms || 0).toFixed(1)} ms
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {historyData.map((item, idx) => (
+            <div key={item.id || idx} className="kinetic-card kinetic-card-hover" style={{ padding: '1.5rem 2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span className="kinetic-label" style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.2rem 0.6rem' }}>
+                    {item.type === 'voice' ? 'VOICE' : 'TEXT'}
+                  </span>
+                  <span className="kinetic-label">{item.timestamp}</span>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <span className="kinetic-label" style={{ color: item.is_grounded ? 'var(--accent-yellow)' : '#ff3344' }}>
+                    {item.is_grounded ? '✓ GROUNDED' : '⚠️ UNVERIFIED'}
+                  </span>
+                  <span className="kinetic-label" style={{ border: '1px solid var(--border-zinc)', padding: '0.2rem 0.6rem' }}>
+                    TOTAL: {(item.latency?.total_ms || 0).toFixed(1)} MS
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ fontSize: '1.3rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+                "{item.query}"
+              </div>
+              <p className="kinetic-card-desc" style={{ marginBottom: '1rem' }}>
+                {item.answer}
+              </p>
+
+              <div style={{ display: 'flex', gap: '1.5rem', borderTop: '1px solid var(--border-zinc)', paddingTop: '0.75rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-fg)', textTransform: 'uppercase' }}>
+                <span>STT: {(item.latency?.stt_ms || 0).toFixed(1)}ms</span>
+                <span>EMB: {(item.latency?.embedding_ms || 0).toFixed(1)}ms</span>
+                <span>FAISS: {(item.latency?.vector_search_ms || 0).toFixed(2)}ms</span>
+                <span>LLM: {(item.latency?.llm_ms || 0).toFixed(1)}ms</span>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -87,72 +87,77 @@ export default function DatasetIngestion() {
   };
 
   return (
-    <div className="tab-container">
-      <div className="section-header">
+    <div style={{ padding: '3rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
-          <h2 className="section-title">
-            <Database size={22} color="var(--accent-cyan)" /> Datasets & Document Ingestion
-          </h2>
-          <p className="section-subtitle">
-            Upload any document (PDF, Word, CSV, Excel, JSON, Markdown, TXT, HTML) to chunk, embed via e5-small, and update your local FAISS index dynamically.
+          <h2 className="kinetic-section-heading">DATASETS & INGESTION</h2>
+          <p className="kinetic-subheading" style={{ marginTop: '0.5rem' }}>
+            Upload any document (.pdf, .docx, .csv, .xlsx, .json, .txt, .md) to chunk and embed into FAISS index.
           </p>
         </div>
-        <button onClick={fetchDatasetInfo} className="action-btn secondary">
-          <RefreshCw size={14} className={loadingInfo ? 'spin-icon' : ''} /> Refresh Stats
+        <button onClick={fetchDatasetInfo} className="kinetic-btn kinetic-btn-outline" style={{ padding: '0.5rem 1rem' }}>
+          <RefreshCw size={16} className={loadingInfo ? 'spin-icon' : ''} /> REFRESH STATS
         </button>
       </div>
 
       {/* Dataset Overview Cards */}
       {datasetsInfo && (
-        <div className="dataset-stats-grid">
-          <div className="stat-card">
-            <div className="stat-label">Active Dataset</div>
-            <div className="stat-value">{datasetsInfo.dataset_name}</div>
+        <div className="quick-actions-grid" style={{ marginBottom: '3rem' }}>
+          <div className="kinetic-card">
+            <div className="kinetic-num-bg">01</div>
+            <div className="kinetic-card-title">ACTIVE DATASET</div>
+            <div className="kinetic-card-desc">{datasetsInfo.dataset_name}</div>
           </div>
-          <div className="stat-card">
-            <div className="stat-label">Index Type & Dim</div>
-            <div className="stat-value highlight">{datasetsInfo.vector_store_type} ({datasetsInfo.dimension}-D)</div>
+          <div className="kinetic-card">
+            <div className="kinetic-num-bg">02</div>
+            <div className="kinetic-card-title">INDEX TYPE</div>
+            <div className="kinetic-card-desc" style={{ color: 'var(--accent-yellow)', fontWeight: 700 }}>
+              {datasetsInfo.vector_store_type} ({datasetsInfo.dimension}-D)
+            </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-label">Indexed Passages</div>
-            <div className="stat-value">{datasetsInfo.total_passages} vectors</div>
+          <div className="kinetic-card">
+            <div className="kinetic-num-bg">03</div>
+            <div className="kinetic-card-title">INDEXED PASSAGES</div>
+            <div className="kinetic-card-desc">{datasetsInfo.total_passages} Dense Vectors</div>
           </div>
         </div>
       )}
 
-      {/* Upload & Text Ingestion Form */}
-      <div className="ingest-card">
-        <h3 className="card-subtitle"><Plus size={16} /> Ingest New Document / Knowledge Passage</h3>
+      {/* Upload Form */}
+      <div className="kinetic-card" style={{ marginBottom: '3rem' }}>
+        <h3 className="kinetic-card-title" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Plus size={20} color="var(--accent-yellow)" /> INGEST NEW DOCUMENT
+        </h3>
 
         {successMsg && (
-          <div className="success-banner">
-            <CheckCircle2 size={18} /> {successMsg}
+          <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '1rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+            ✓ {successMsg}
           </div>
         )}
         {errorMsg && (
-          <div className="error-banner">
-            <AlertCircle size={18} /> {errorMsg}
+          <div style={{ backgroundColor: '#ff3344', color: '#fff', padding: '1rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+            ⚠️ {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleIngest} className="ingest-form">
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Document Title / Identifier</label>
+        <form onSubmit={handleIngest}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '1.5rem' }}>
+            <div>
+              <span className="kinetic-label">DOCUMENT TITLE / IDENTIFIER:</span>
               <input
                 type="text"
-                className="form-input"
+                className="kinetic-input"
                 placeholder="e.g. Goa Tourism Guide 2026"
                 value={docTitle}
                 onChange={(e) => setDocTitle(e.target.value)}
               />
             </div>
 
-            <div className="form-group">
-              <label>Source URL (Optional Attribution)</label>
+            <div>
+              <span className="kinetic-label">SOURCE URL (OPTIONAL):</span>
               <input
                 type="url"
-                className="form-input"
+                className="kinetic-input"
                 placeholder="https://example.org/docs/goa-guide"
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
@@ -160,7 +165,8 @@ export default function DatasetIngestion() {
             </div>
           </div>
 
-          <div className="upload-dropzone">
+          {/* Brutalist Drag-and-Drop Surface */}
+          <div style={{ margin: '2rem 0' }}>
             <input
               type="file"
               id="file-upload"
@@ -168,48 +174,67 @@ export default function DatasetIngestion() {
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
-            <label htmlFor="file-upload" className="dropzone-label">
-              <UploadCloud size={32} color="var(--accent-cyan)" />
+            <label 
+              htmlFor="file-upload" 
+              className="kinetic-card kinetic-card-hover"
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                padding: '4rem 2rem', 
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+            >
+              <UploadCloud size={48} color="var(--accent-yellow)" style={{ marginBottom: '1rem' }} />
               {selectedFile ? (
-                <span className="file-name">Selected: <strong>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)</span>
+                <div style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                  SELECTED FILE: <span style={{ color: 'var(--accent-yellow)' }}>{selectedFile.name}</span> ({Math.round(selectedFile.size / 1024)} KB)
+                </div>
               ) : (
-                <span>Drag & drop any data file here, or <strong>click to browse</strong> (.pdf, .docx, .csv, .xlsx, .json, .txt, .md)</span>
+                <div style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase' }}>
+                  DRAG & DROP ANY FILE HERE OR <span style={{ color: 'var(--accent-yellow)' }}>CLICK TO BROWSE</span> (.PDF, .DOCX, .CSV, .XLSX, .JSON, .TXT)
+                </div>
               )}
             </label>
           </div>
 
-          <div className="or-divider"><span>OR PASTE RAW TEXT</span></div>
+          <div style={{ margin: '2rem 0', textTransform: 'uppercase', fontWeight: 700, color: 'var(--muted-fg)', textAlign: 'center' }}>
+            — OR PASTE RAW TEXT —
+          </div>
 
-          <div className="form-group">
+          <div style={{ marginBottom: '2rem' }}>
             <textarea
-              className="form-textarea"
-              rows={4}
+              className="kinetic-input"
+              style={{ minHeight: '120px', resize: 'vertical' }}
               placeholder="Paste raw text or passage content to chunk & embed into FAISS..."
               value={docText}
               onChange={(e) => setDocText(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="action-btn primary large" disabled={ingesting}>
-            {ingesting ? <RefreshCw size={18} className="spin-icon" /> : <Plus size={18} />}
-            {ingesting ? 'Chunking, Embedding & Building Index...' : 'Ingest & Embed into FAISS Index'}
+          <button type="submit" className="kinetic-btn kinetic-btn-primary" style={{ width: '100%', padding: '1.25rem' }} disabled={ingesting}>
+            {ingesting ? <RefreshCw size={20} className="spin-icon" /> : <Plus size={20} />}
+            {ingesting ? 'CHUNKING, EMBEDDING & BUILDING INDEX...' : 'INGEST & EMBED INTO FAISS INDEX'}
           </button>
         </form>
       </div>
 
       {/* Dataset Sample Passages Viewer */}
       {datasetsInfo?.sample_passages && (
-        <div className="passages-viewer">
-          <h3 className="card-subtitle"><BookOpen size={16} /> Sample Passages in Active Index ({datasetsInfo.sample_passages.length})</h3>
-          <div className="passages-list">
+        <div>
+          <h3 className="kinetic-section-heading" style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>
+            INDEXED PASSAGES ({datasetsInfo.sample_passages.length})
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
             {datasetsInfo.sample_passages.map((p) => (
-              <div key={p.passage_id} className="passage-item">
-                <div className="passage-header">
-                  <span className="passage-id"><FileText size={13} /> {p.passage_id}</span>
-                  <span className="word-count">{p.word_count} words</span>
+              <div key={p.passage_id} className="kinetic-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                  <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>PASSAGE #{p.passage_id}</span>
+                  <span className="kinetic-label">{p.word_count} WORDS</span>
                 </div>
-                <div className="passage-text">{p.text_snippet}</div>
-                {p.url && <div className="passage-url">{p.url}</div>}
+                <p className="kinetic-card-desc">"{p.text_snippet}"</p>
               </div>
             ))}
           </div>

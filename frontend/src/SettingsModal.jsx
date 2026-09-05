@@ -20,36 +20,37 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3 className="modal-title">
-            <Sliders size={18} color="var(--accent-cyan)" /> Pipeline Settings & Config
+      <div className="modal-content-kinetic" onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '2px solid var(--border-zinc)', paddingBottom: '1rem' }}>
+          <h3 className="kinetic-card-title" style={{ margin: 0 }}>
+            PIPELINE CONFIGURATION
           </h3>
-          <button className="modal-close-btn" onClick={onClose}>
-            <X size={18} />
+          <button className="icon-btn-brutalist" onClick={onClose}>
+            <X size={20} />
           </button>
         </div>
 
-        <div className="modal-body">
-          <div className="setting-group">
-            <label className="setting-label">
-              <Sliders size={14} /> Retrieved Top-K Passages: <strong>{settings.top_k}</strong>
-            </label>
-            <p className="setting-desc">Number of vector passage chunks fetched from FAISS per query.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '2.5rem' }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span className="kinetic-label">RETRIEVED TOP-K PASSAGES</span>
+              <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>{settings.top_k}</span>
+            </div>
             <input
               type="range"
               min="1"
               max="5"
               value={settings.top_k}
               onChange={(e) => handleChange('top_k', Number(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--accent-yellow)' }}
             />
           </div>
 
-          <div className="setting-group">
-            <label className="setting-label">
-              <Hash size={14} /> Similarity Score Threshold: <strong>{settings.score_threshold}</strong>
-            </label>
-            <p className="setting-desc">Minimum cosine similarity score required for passage grounding.</p>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span className="kinetic-label">SIMILARITY SCORE THRESHOLD</span>
+              <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>{settings.score_threshold}</span>
+            </div>
             <input
               type="range"
               min="0.10"
@@ -57,44 +58,41 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
               step="0.05"
               value={settings.score_threshold}
               onChange={(e) => handleChange('score_threshold', Number(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--accent-yellow)' }}
             />
           </div>
 
-          <div className="setting-group">
-            <label className="setting-label">
-              <Zap size={14} /> LLM Provider & Model
-            </label>
+          <div>
+            <span className="kinetic-label" style={{ display: 'block', marginBottom: '0.5rem' }}>LLM MODEL PROVIDER</span>
             <select
-              className="form-input"
+              className="kinetic-select"
               value={settings.model_name}
               onChange={(e) => handleChange('model_name', e.target.value)}
             >
-              <option value="gemini-3.6-flash">Google Gemini 3.6 Flash (Sub-200ms)</option>
-              <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
+              <option value="gemini-3.6-flash">GOOGLE GEMINI 3.6 FLASH (SUB-200MS)</option>
+              <option value="gemini-3.5-flash">GOOGLE GEMINI 3.5 FLASH</option>
             </select>
           </div>
 
-          <div className="setting-group">
-            <label className="setting-label">
-              <ShieldCheck size={14} /> Speech-to-Text Provider
-            </label>
+          <div>
+            <span className="kinetic-label" style={{ display: 'block', marginBottom: '0.5rem' }}>SPEECH-TO-TEXT PROVIDER</span>
             <select
-              className="form-input"
+              className="kinetic-select"
               value={settings.stt_provider}
               onChange={(e) => handleChange('stt_provider', e.target.value)}
             >
-              <option value="Sarvam AI (saaras:v1)">Sarvam AI saaras:v1 (Indian Languages & English)</option>
-              <option value="WebSpeech (Browser Dictation)">Web Speech API (Real-time Typing)</option>
+              <option value="Sarvam AI (saaras:v1)">SARVAM AI SAARAS:V1 (INDIAN LANGUAGES)</option>
+              <option value="WebSpeech (Browser Dictation)">WEB SPEECH API (REAL-TIME DICTATION)</option>
             </select>
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button className="action-btn secondary" onClick={handleReset}>
-            <RotateCcw size={14} /> Reset Defaults
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+          <button className="kinetic-btn kinetic-btn-outline" onClick={handleReset}>
+            <RotateCcw size={16} /> RESET
           </button>
-          <button className="action-btn primary" onClick={onClose}>
-            Apply Settings
+          <button className="kinetic-btn kinetic-btn-primary" onClick={onClose}>
+            APPLY CONFIG
           </button>
         </div>
       </div>
