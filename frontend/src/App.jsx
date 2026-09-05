@@ -3,16 +3,19 @@ import {
   Mic, MicOff, Send, Sparkles, ShieldCheck, 
   Clock, RefreshCw, BarChart2,
   BookOpen, ChevronRight, MessageSquare, Volume2, Zap,
-  Search, History, Database, Sliders, AlertCircle
+  Search, History, Database, Sliders, AlertCircle,
+  Bell, Calendar, Globe, Cpu, CheckCircle2
 } from 'lucide-react';
 import AudioVisualizer from './AudioVisualizer';
 import VectorExplorer from './VectorExplorer';
 import QueryHistory from './QueryHistory';
 import DatasetIngestion from './DatasetIngestion';
 import SettingsModal from './SettingsModal';
+import SplashScreen from './SplashScreen';
 import { getApiUrl } from './apiConfig';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState('console'); // 'console' | 'explorer' | 'history' | 'datasets'
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
@@ -245,8 +248,12 @@ export default function App() {
   const confidencePct = pipelineResult?.confidence !== undefined ? (pipelineResult.confidence * 100).toFixed(0) : '95';
 
   return (
-    <div className="app-wrapper">
-      {/* Navbar Header */}
+    <>
+      {showSplash && (
+        <SplashScreen onComplete={() => setShowSplash(false)} />
+      )}
+      <div className={`app-wrapper ${!showSplash ? 'landing-reveal-wrapper' : ''}`}>
+        {/* Navbar Header */}
       <header className="navbar">
         <div className="brand">
           <div className="brand-icon">
@@ -452,6 +459,104 @@ export default function App() {
             </div>
           </div>
 
+          {/* Quick Actions Section */}
+          <section className="quick-actions-section">
+            <div className="section-tag-header">
+              <h2 className="section-tag-title">
+                <Zap size={14} /> Quick Actions
+              </h2>
+              <span className="section-tag-sub">tap to execute</span>
+            </div>
+            <div className="quick-actions-grid">
+              <div 
+                className="quick-action-card"
+                onClick={() => handleSampleClick("What is Retrieval Augmented Generation?")}
+              >
+                <div className="quick-action-header">
+                  <BookOpen size={16} className="quick-action-icon" />
+                  <span className="quick-action-title">Explain RAG Framework</span>
+                </div>
+                <p className="quick-action-desc">Query knowledge base for architecture & vector search overview</p>
+              </div>
+
+              <div 
+                className="quick-action-card"
+                onClick={() => handleSampleClick("Where is Goa located in India?")}
+              >
+                <div className="quick-action-header">
+                  <Globe size={16} className="quick-action-icon" />
+                  <span className="quick-action-title">Geographical Query</span>
+                </div>
+                <p className="quick-action-desc">Inspect grounded state facts & MSMARCO attribution</p>
+              </div>
+
+              <div 
+                className="quick-action-card"
+                onClick={() => handleSampleClick("Sarvam AI किस लिए प्रसिद्ध है?")}
+              >
+                <div className="quick-action-header">
+                  <MessageSquare size={16} className="quick-action-icon" />
+                  <span className="quick-action-title">Indic Voice Translate</span>
+                </div>
+                <p className="quick-action-desc">Test multi-lingual STT dictation in Hindi & English</p>
+              </div>
+
+              <div 
+                className="quick-action-card"
+                onClick={() => setActiveTab('explorer')}
+              >
+                <div className="quick-action-header">
+                  <Search size={16} className="quick-action-icon" />
+                  <span className="quick-action-title">Vector Search Explorer</span>
+                </div>
+                <p className="quick-action-desc">Inspect FAISS 384-D dense embeddings & similarity ranks</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Recent Activity Section */}
+          <section className="recent-activity-section">
+            <div className="section-tag-header">
+              <h2 className="section-tag-title">
+                <Clock size={14} /> Recent Activity
+              </h2>
+              <button 
+                type="button" 
+                onClick={() => setActiveTab('history')} 
+                style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', fontSize: '0.8rem', cursor: 'pointer' }}
+              >
+                View full audit log →
+              </button>
+            </div>
+            <div className="recent-activity-list">
+              <div className="recent-activity-item">
+                <div className="recent-activity-main">
+                  <div className="recent-activity-icon-badge">
+                    <Mic size={16} />
+                  </div>
+                  <div>
+                    <div className="recent-activity-query">"What is Retrieval Augmented Generation?"</div>
+                    <div className="recent-activity-desc">Grounded answer retrieved via FAISS e5-small index</div>
+                  </div>
+                </div>
+                <span className="status-tag-completed">Completed</span>
+              </div>
+
+              <div className="recent-activity-item">
+                <div className="recent-activity-main">
+                  <div className="recent-activity-icon-badge">
+                    <Database size={16} />
+                  </div>
+                  <div>
+                    <div className="recent-activity-query">"Sarvam AI speech-to-text latency optimization"</div>
+                    <div className="recent-activity-desc">Sub-200ms pipeline execution benchmarked</div>
+                  </div>
+                </div>
+                <span className="status-tag-completed">Completed</span>
+              </div>
+            </div>
+          </section>
+
           {/* Results Showcase Section */}
           {pipelineResult && (
             <div className="results-container">
@@ -622,5 +727,7 @@ export default function App() {
         onUpdateSettings={setSettings}
       />
     </div>
+    </>
   );
 }
+
