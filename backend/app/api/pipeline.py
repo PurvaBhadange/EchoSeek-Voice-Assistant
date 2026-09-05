@@ -46,7 +46,7 @@ class PipelineServicesContainer:
 
     def initialize(self):
         print("[*] Initializing Pipeline Services Container...")
-        self.embedding_engine = EmbeddingEngine("intfloat/multilingual-e5-small")
+        self.embedding_engine = EmbeddingEngine("BAAI/bge-small-en-v1.5")
         self.vector_store = FAISSVectorStore(dimension=384)
         
         # Resolve path to root data directory
