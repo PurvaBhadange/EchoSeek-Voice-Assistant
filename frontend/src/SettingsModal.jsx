@@ -12,9 +12,9 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
     onUpdateSettings({
       top_k: 2,
       score_threshold: 0.30,
-      model_name: 'gemini-3.5-flash',
+      model_name: 'gemini-3.6-flash',
       embedding_model: 'intfloat/multilingual-e5-small',
-      stt_provider: 'Sarvam AI (saaras:v1)'
+      stt_provider: 'Sarvam AI (saaras:v3)'
     });
   };
 
@@ -69,8 +69,8 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
               value={settings.model_name}
               onChange={(e) => handleChange('model_name', e.target.value)}
             >
-              <option value="gemini-3.5-flash">Google Gemini 3.5 Flash (Sub-200ms)</option>
-              <option value="gemini-3.5-pro">Google Gemini 3.5 Pro (Deep Grounding)</option>
+              <option value="gemini-3.6-flash">Google Gemini 3.6 Flash (Sub-200ms)</option>
+              <option value="gemini-3.5-flash">Google Gemini 3.5 Flash</option>
             </select>
           </div>
 

@@ -78,8 +78,9 @@ def test_guardrails_suite():
         print(f"  • Action Taken: {res.action_taken}")
         print(f"  • Safe?       : {res.is_safe} | On-Topic? : {res.is_on_topic} | Grounded? : {res.is_grounded}")
         print(f"  • Final Output: \"{res.final_answer}\"")
-        if res.flagged_reason:
-            print(f"  • Flagged     : {res.flagged_reason}")
+        flagged = getattr(res, "flagged_reason", None)
+        if flagged:
+            print(f"  • Flagged     : {flagged}")
 
     print("\n" + "=" * 75)
     print("GUARDRAILS TEST SUITE COMPLETE")

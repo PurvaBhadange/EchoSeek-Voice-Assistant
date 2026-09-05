@@ -94,7 +94,7 @@ export default function DatasetIngestion() {
             <Database size={22} color="var(--accent-cyan)" /> Datasets & Document Ingestion
           </h2>
           <p className="section-subtitle">
-            Upload custom PDF/TXT/Markdown documents to chunk, embed via e5-small, and update your local FAISS index dynamically.
+            Upload any document (PDF, Word, CSV, Excel, JSON, Markdown, TXT, HTML) to chunk, embed via e5-small, and update your local FAISS index dynamically.
           </p>
         </div>
         <button onClick={fetchDatasetInfo} className="action-btn secondary">
@@ -164,7 +164,7 @@ export default function DatasetIngestion() {
             <input
               type="file"
               id="file-upload"
-              accept=".txt,.md,.json,.pdf"
+              accept="*"
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
@@ -173,7 +173,7 @@ export default function DatasetIngestion() {
               {selectedFile ? (
                 <span className="file-name">Selected: <strong>{selectedFile.name}</strong> ({Math.round(selectedFile.size / 1024)} KB)</span>
               ) : (
-                <span>Drag & drop a file here, or <strong>click to browse</strong> (.txt, .md, .json)</span>
+                <span>Drag & drop any data file here, or <strong>click to browse</strong> (.pdf, .docx, .csv, .xlsx, .json, .txt, .md)</span>
               )}
             </label>
           </div>

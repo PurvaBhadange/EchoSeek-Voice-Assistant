@@ -19,8 +19,8 @@ export default function App() {
   const [settings, setSettings] = useState({
     top_k: 2,
     score_threshold: 0.30,
-    model_name: 'gemini-3.5-flash',
-    stt_provider: 'Sarvam AI (saaras:v1)'
+    model_name: 'gemini-3.6-flash',
+    stt_provider: 'Sarvam AI (saaras:v3)'
   });
 
   const [isRecording, setIsRecording] = useState(false);

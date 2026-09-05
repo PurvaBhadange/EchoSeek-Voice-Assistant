@@ -16,7 +16,7 @@ import json
 # Add backend directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../backend")))
 
-from app.api.pipeline import pipeline_services, APITextQueryRequest
+from app.api.pipeline import pipeline_services, TextQueryRequest
 
 def create_sample_wav_bytes() -> bytes:
     buffer = io.BytesIO()

@@ -22,6 +22,7 @@ dist-ssr/
 data/*.json
 data/*.parquet
 data/*.csv
+data/*.db
 data/faiss_index/
 data/embeddings/
 !data/.gitkeep

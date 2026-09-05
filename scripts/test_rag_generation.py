@@ -41,7 +41,7 @@ def test_rag_generation():
     store.build_index(embeddings_matrix, chunks)
 
     engine = EmbeddingEngine("intfloat/multilingual-e5-small")
-    llm_service = GeminiLLMService(model_name="gemini-3.5-flash")
+    llm_service = GeminiLLMService(model_name="gemini-3.6-flash")
 
     test_queries = [
         "What is Retrieval Augmented Generation?",

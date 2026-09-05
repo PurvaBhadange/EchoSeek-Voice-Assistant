@@ -20,6 +20,7 @@ class GuardrailResult(BaseModel):
     confidence: float
     final_answer: str
     action_taken: str
+    flagged_reason: Optional[str] = None
 
 class GuardrailsEngine:
     def __init__(self, min_similarity_threshold: float = 0.30):
@@ -45,7 +46,7 @@ class GuardrailsEngine:
         self, 
         query: str, 
         llm_answer: str, 
-        retrieved_chunks: List[Chunk]
+        retrieved_chunks: List[Any]
     ) -> GuardrailResult:
         # Step 1: Input Safety Check
         if not self.check_input_safety(query):
@@ -55,24 +56,36 @@ class GuardrailsEngine:
                 is_grounded=False,
                 confidence=0.0,
                 final_answer="Security Request Refused: Prompt injection or unauthorized instruction override detected.",
-                action_taken="REJECTED_UNSAFE"
+                action_taken="REJECTED_UNSAFE",
+                flagged_reason="PROMPT_INJECTION_DETECTED"
             )
 
         # Step 2: Context Availability & Relevance Check
         if not retrieved_chunks:
-            # Fallback when query has no matching dataset passages
             return GuardrailResult(
                 is_safe=True,
                 is_on_topic=False,
                 is_grounded=False,
                 confidence=0.50,
                 final_answer=f"I couldn't find enough information in the knowledge base for '{query}'.",
-                action_taken="REJECTED_OFF_TOPIC"
+                action_taken="REJECTED_OFF_TOPIC",
+                flagged_reason="NO_CONTEXT_CHUNKS"
+            )
+
+        top_score = float(getattr(retrieved_chunks[0], "score", 1.0))
+        if top_score < self.min_similarity_threshold:
+            return GuardrailResult(
+                is_safe=True,
+                is_on_topic=False,
+                is_grounded=False,
+                confidence=0.50,
+                final_answer=f"I couldn't find enough information in the knowledge base for '{query}'.",
+                action_taken="REJECTED_OFF_TOPIC",
+                flagged_reason="LOW_SIMILARITY_SCORE"
             )
 
         # Step 3: Grounded Passage Citation Check
-        top_score = getattr(retrieved_chunks[0], "score", 1.0)
-        confidence = min(max(float(top_score), 0.70), 0.99)
+        confidence = min(max(top_score, 0.70), 0.99)
 
         return GuardrailResult(
             is_safe=True,

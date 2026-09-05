@@ -22,7 +22,7 @@ class LLMResponse(BaseModel):
     tokens_used: Optional[int] = 0
 
 class GeminiLLMService:
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-3.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-3.6-flash"):
         self.api_key = api_key or settings.GEMINI_API_KEY
         self.model_name = model_name
 

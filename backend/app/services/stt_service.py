@@ -29,7 +29,7 @@ class SarvamSTTService:
         self,
         audio_bytes: bytes,
         filename: str = "audio.wav",
-        model: str = "saaras:v1",
+        model: str = "saaras:v3",
         fallback_transcript: Optional[str] = None
     ) -> STTResponse:
         return self.transcribe_audio_bytes(audio_bytes, filename=filename, model=model, fallback_transcript=fallback_transcript)
@@ -38,7 +38,7 @@ class SarvamSTTService:
         self,
         audio_bytes: bytes,
         filename: str = "audio.wav",
-        model: str = "saaras:v1",
+        model: str = "saaras:v3",
         fallback_transcript: Optional[str] = None
     ) -> STTResponse:
         """

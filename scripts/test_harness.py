@@ -44,7 +44,7 @@ def test_harness_orchestration():
 
     embedding_engine = EmbeddingEngine("intfloat/multilingual-e5-small")
     stt_service = SarvamSTTService()
-    llm_service = GeminiLLMService(model_name="gemini-3.5-flash")
+    llm_service = GeminiLLMService(model_name="gemini-3.6-flash")
 
     # Instantiate Harness
     harness = RAGModelHarness(

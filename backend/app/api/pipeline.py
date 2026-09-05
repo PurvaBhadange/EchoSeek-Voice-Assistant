@@ -7,6 +7,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Body
 from pydantic import BaseModel
 
 from app.core.chunker import Chunk, SentenceRecursiveChunker, MetadataAwarePassageChunker
+from app.core.doc_parser import extract_text_from_file_bytes
 from app.core.embedding import EmbeddingEngine
 from app.core.vector_store import FAISSVectorStore
 from app.core.harness import RAGModelHarness, HarnessOutput
@@ -257,8 +258,8 @@ async def ingest_document(
     source_url: Optional[str] = Form("")
 ):
     """
-    Ingests text or uploaded document (.txt, .md, .json), chunks, embeds via e5-small,
-    adds to active FAISS index, and persists update to disk.
+    Ingests text or uploaded document (PDF, Word, CSV, Excel, JSON, HTML, Markdown, TXT),
+    chunks, embeds via e5-small, adds to active FAISS index, and persists update to disk.
     """
     content_text = ""
     doc_title = title or "User Uploaded Document"
@@ -267,16 +268,16 @@ async def ingest_document(
         doc_title = title or file.filename
         raw_bytes = await file.read()
         try:
-            content_text = raw_bytes.decode("utf-8")
-        except Exception:
-            raise HTTPException(status_code=400, detail="Only UTF-8 encoded text files (.txt, .md, .json) are supported.")
+            content_text = extract_text_from_file_bytes(file.filename, raw_bytes)
+        except Exception as err:
+            raise HTTPException(status_code=400, detail=f"Error parsing uploaded file '{file.filename}': {err}")
     elif text:
         content_text = text
     else:
         raise HTTPException(status_code=400, detail="Provide either a file or text content to ingest.")
 
-    if not content_text.strip():
-        raise HTTPException(status_code=400, detail="Ingested text content cannot be empty.")
+    if not content_text or not content_text.strip():
+        raise HTTPException(status_code=400, detail=f"Could not extract readable text content from '{doc_title}'.")
 
     # Create chunks using SentenceRecursiveChunker
     chunker = SentenceRecursiveChunker(target_chunk_size=300, overlap=50)
