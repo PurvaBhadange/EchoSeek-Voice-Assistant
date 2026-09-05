@@ -29,7 +29,7 @@ export default function App() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioStream, setAudioStream] = useState(null);
-  const [voiceLanguage, setVoiceLanguage] = useState('hi-IN'); // Default to Hindi (hi-IN)
+  const [voiceLanguage, setVoiceLanguage] = useState('en-IN'); // Default to Indian English (en-IN)
   const [textInput, setTextInput] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -295,7 +295,7 @@ export default function App() {
             <div className="dictation-hero-container">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <span className="kinetic-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <MessageSquare size={16} color="var(--accent-yellow)" /> VOICE DICTATION CONSOLE
+                  <MessageSquare size={16} color="var(--color-bright-purple)" /> VOICE DICTATION CONSOLE
                 </span>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -322,16 +322,21 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Massive Brutalist Microphone Stage */}
+              {/* Massive Glowing Orb Microphone Stage */}
               <div className="mic-section-wrapper">
-                <button
-                  type="button"
-                  className={`mic-button-kinetic ${isRecording ? 'recording' : ''}`}
-                  onClick={isRecording ? stopRecording : startRecording}
-                  title={isRecording ? 'Stop & Submit' : 'Click to Speak'}
-                >
-                  {isRecording ? <MicOff size={54} /> : <Mic size={54} />}
-                </button>
+                <div className="mic-orb-wrapper">
+                  <div className={`mic-ripple-ring ring-1 ${isRecording ? 'active' : ''}`}></div>
+                  <div className={`mic-ripple-ring ring-2 ${isRecording ? 'active' : ''}`}></div>
+                  <div className={`mic-ripple-ring ring-3 ${isRecording ? 'active' : ''}`}></div>
+                  <button
+                    type="button"
+                    className={`mic-button-kinetic ${isRecording ? 'recording' : ''}`}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    title={isRecording ? 'Stop & Submit' : 'Click to Speak'}
+                  >
+                    {isRecording ? <MicOff size={56} /> : <Mic size={56} />}
+                  </button>
+                </div>
 
                 <div style={{ textAlign: 'center', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
                   {isRecording ? (
@@ -339,7 +344,7 @@ export default function App() {
                       SPEAK NOW IN {voiceLanguage === 'hi-IN' ? 'HINDI' : 'YOUR CHOSEN LANGUAGE'}... WORDS TYPE LIVE BELOW!
                     </span>
                   ) : loading ? (
-                    <span style={{ color: 'var(--accent-yellow)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ color: 'var(--accent-blue)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                       <RefreshCw size={18} className="spin-icon" /> {loadingText}
                     </span>
                   ) : (
@@ -411,11 +416,11 @@ export default function App() {
               <div className="grounded-response-box">
                 <div className="grounded-header">
                   <div className="grounded-title" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <Sparkles size={22} color="var(--accent-yellow)" /> GROUNDED ANSWER
+                    <Sparkles size={22} color="var(--accent-blue)" /> GROUNDED ANSWER
                   </div>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     <span style={{
-                      backgroundColor: 'var(--accent-yellow)',
+                      backgroundColor: 'var(--accent-blue)',
                       color: 'var(--accent-fg)',
                       fontWeight: 700,
                       fontSize: '0.8rem',
@@ -425,8 +430,8 @@ export default function App() {
                       CONFIDENCE: {confidencePct}%
                     </span>
                     <span style={{
-                      border: '2px solid var(--accent-yellow)',
-                      color: 'var(--accent-yellow)',
+                      border: '2px solid var(--accent-blue)',
+                      color: 'var(--accent-blue)',
                       fontWeight: 700,
                       fontSize: '0.8rem',
                       padding: '0.3rem 0.8rem',
@@ -447,7 +452,7 @@ export default function App() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
                       {pipelineResult.sources.map((src, i) => (
                         <div key={i} className="kinetic-card" style={{ padding: '1rem' }}>
-                          <div style={{ color: 'var(--accent-yellow)', fontWeight: 700, fontSize: '0.8rem' }}>
+                          <div style={{ color: 'var(--accent-blue)', fontWeight: 700, fontSize: '0.8rem' }}>
                             PASSAGE {src.passage_id}
                           </div>
                           <div style={{ fontSize: '0.85rem', color: 'var(--muted-fg)', marginTop: '0.25rem' }}>
@@ -514,7 +519,7 @@ export default function App() {
                   type="button" 
                   onClick={() => setActiveTab('history')} 
                   className="kinetic-label"
-                  style={{ background: 'none', border: 'none', color: 'var(--accent-yellow)', cursor: 'pointer' }}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer' }}
                 >
                   VIEW FULL AUDIT LOG →
                 </button>
@@ -522,7 +527,7 @@ export default function App() {
               <div className="recent-activity-list">
                 <div className="recent-activity-item">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
+                    <div style={{ backgroundColor: 'var(--accent-blue)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
                       <Mic size={18} />
                     </div>
                     <div>
@@ -530,12 +535,12 @@ export default function App() {
                       <div style={{ color: 'var(--muted-fg)', fontSize: '0.85rem' }}>Grounded answer retrieved via FAISS e5-small index</div>
                     </div>
                   </div>
-                  <span style={{ border: '1px solid var(--accent-yellow)', color: 'var(--accent-yellow)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
+                  <span style={{ border: '1px solid var(--accent-blue)', color: 'var(--accent-blue)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
                 </div>
 
                 <div className="recent-activity-item">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
+                    <div style={{ backgroundColor: 'var(--accent-blue)', color: '#000', padding: '0.5rem', fontWeight: 700 }}>
                       <Database size={18} />
                     </div>
                     <div>
@@ -543,7 +548,7 @@ export default function App() {
                       <div style={{ color: 'var(--muted-fg)', fontSize: '0.85rem' }}>Sub-200ms pipeline execution benchmarked</div>
                     </div>
                   </div>
-                  <span style={{ border: '1px solid var(--accent-yellow)', color: 'var(--accent-yellow)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
+                  <span style={{ border: '1px solid var(--accent-blue)', color: 'var(--accent-blue)', padding: '0.3rem 0.8rem', fontWeight: 700, fontSize: '0.75rem' }}>COMPLETED</span>
                 </div>
               </div>
             </section>

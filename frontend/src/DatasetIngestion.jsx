@@ -111,7 +111,7 @@ export default function DatasetIngestion() {
           <div className="kinetic-card">
             <div className="kinetic-num-bg">02</div>
             <div className="kinetic-card-title">INDEX TYPE</div>
-            <div className="kinetic-card-desc" style={{ color: 'var(--accent-yellow)', fontWeight: 700 }}>
+            <div className="kinetic-card-desc" style={{ color: 'var(--accent-blue)', fontWeight: 700 }}>
               {datasetsInfo.vector_store_type} ({datasetsInfo.dimension}-D)
             </div>
           </div>
@@ -126,11 +126,11 @@ export default function DatasetIngestion() {
       {/* Upload Form */}
       <div className="kinetic-card" style={{ marginBottom: '3rem' }}>
         <h3 className="kinetic-card-title" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Plus size={20} color="var(--accent-yellow)" /> INGEST NEW DOCUMENT
+          <Plus size={20} color="var(--accent-blue)" /> INGEST NEW DOCUMENT
         </h3>
 
         {successMsg && (
-          <div style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '1rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+          <div style={{ backgroundColor: 'var(--accent-blue)', color: '#000', padding: '1rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '1.5rem' }}>
             ✓ {successMsg}
           </div>
         )}
@@ -187,14 +187,14 @@ export default function DatasetIngestion() {
                 textAlign: 'center'
               }}
             >
-              <UploadCloud size={48} color="var(--accent-yellow)" style={{ marginBottom: '1rem' }} />
+              <UploadCloud size={48} color="var(--accent-blue)" style={{ marginBottom: '1rem' }} />
               {selectedFile ? (
                 <div style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                  SELECTED FILE: <span style={{ color: 'var(--accent-yellow)' }}>{selectedFile.name}</span> ({Math.round(selectedFile.size / 1024)} KB)
+                  SELECTED FILE: <span style={{ color: 'var(--accent-blue)' }}>{selectedFile.name}</span> ({Math.round(selectedFile.size / 1024)} KB)
                 </div>
               ) : (
                 <div style={{ fontSize: '1.2rem', fontWeight: 700, textTransform: 'uppercase' }}>
-                  DRAG & DROP ANY FILE HERE OR <span style={{ color: 'var(--accent-yellow)' }}>CLICK TO BROWSE</span> (.PDF, .DOCX, .CSV, .XLSX, .JSON, .TXT)
+                  DRAG & DROP ANY FILE HERE OR <span style={{ color: 'var(--accent-blue)' }}>CLICK TO BROWSE</span> (.PDF, .DOCX, .CSV, .XLSX, .JSON, .TXT)
                 </div>
               )}
             </label>
@@ -231,7 +231,7 @@ export default function DatasetIngestion() {
             {datasetsInfo.sample_passages.map((p) => (
               <div key={p.passage_id} className="kinetic-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                  <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>PASSAGE #{p.passage_id}</span>
+                  <span className="kinetic-label" style={{ color: 'var(--accent-blue)' }}>PASSAGE #{p.passage_id}</span>
                   <span className="kinetic-label">{p.word_count} WORDS</span>
                 </div>
                 <p className="kinetic-card-desc">"{p.text_snippet}"</p>

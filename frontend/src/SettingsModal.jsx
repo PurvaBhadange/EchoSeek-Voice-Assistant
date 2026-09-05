@@ -34,7 +34,7 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
               <span className="kinetic-label">RETRIEVED TOP-K PASSAGES</span>
-              <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>{settings.top_k}</span>
+              <span className="kinetic-label" style={{ color: 'var(--accent-blue)' }}>{settings.top_k}</span>
             </div>
             <input
               type="range"
@@ -42,14 +42,14 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
               max="5"
               value={settings.top_k}
               onChange={(e) => handleChange('top_k', Number(e.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-yellow)' }}
+              style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
             />
           </div>
 
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
               <span className="kinetic-label">SIMILARITY SCORE THRESHOLD</span>
-              <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>{settings.score_threshold}</span>
+              <span className="kinetic-label" style={{ color: 'var(--accent-blue)' }}>{settings.score_threshold}</span>
             </div>
             <input
               type="range"
@@ -58,7 +58,7 @@ export default function SettingsModal({ isOpen, onClose, settings, onUpdateSetti
               step="0.05"
               value={settings.score_threshold}
               onChange={(e) => handleChange('score_threshold', Number(e.target.value))}
-              style={{ width: '100%', accentColor: 'var(--accent-yellow)' }}
+              style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
             />
           </div>
 

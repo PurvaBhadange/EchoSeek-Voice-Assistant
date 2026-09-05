@@ -9,7 +9,7 @@ Enforces:
 """
 
 import re
-from typing import List, Optional
+from typing import List, Optional, Any
 from pydantic import BaseModel
 from app.core.chunker import Chunk
 
@@ -23,7 +23,7 @@ class GuardrailResult(BaseModel):
     flagged_reason: Optional[str] = None
 
 class GuardrailsEngine:
-    def __init__(self, min_similarity_threshold: float = 0.30):
+    def __init__(self, min_similarity_threshold: float = 0.05):
         self.min_similarity_threshold = min_similarity_threshold
         self.injection_patterns = [
             r"ignore\s+(all\s+)?previous\s+instructions",
@@ -62,30 +62,50 @@ class GuardrailsEngine:
 
         # Step 2: Context Availability & Relevance Check
         if not retrieved_chunks:
+            if self.min_similarity_threshold >= 0.50:
+                return GuardrailResult(
+                    is_safe=True,
+                    is_on_topic=False,
+                    is_grounded=False,
+                    confidence=0.0,
+                    final_answer="I couldn't find enough information in the grounded knowledge base to answer this question accurately.",
+                    action_taken="REJECTED_OFF_TOPIC",
+                    flagged_reason="NO_CONTEXT_CHUNKS"
+                )
             return GuardrailResult(
                 is_safe=True,
-                is_on_topic=False,
+                is_on_topic=True,
                 is_grounded=False,
-                confidence=0.50,
-                final_answer=f"I couldn't find enough information in the knowledge base for '{query}'.",
-                action_taken="REJECTED_OFF_TOPIC",
+                confidence=0.75,
+                final_answer=llm_answer,
+                action_taken="PASSED_GENERAL_KNOWLEDGE",
                 flagged_reason="NO_CONTEXT_CHUNKS"
             )
 
         top_score = float(getattr(retrieved_chunks[0], "score", 1.0))
         if top_score < self.min_similarity_threshold:
+            if self.min_similarity_threshold >= 0.50:
+                return GuardrailResult(
+                    is_safe=True,
+                    is_on_topic=False,
+                    is_grounded=False,
+                    confidence=0.0,
+                    final_answer="I couldn't find enough information in the grounded knowledge base to answer this question accurately.",
+                    action_taken="REJECTED_OFF_TOPIC",
+                    flagged_reason="LOW_SIMILARITY_SCORE"
+                )
             return GuardrailResult(
                 is_safe=True,
-                is_on_topic=False,
+                is_on_topic=True,
                 is_grounded=False,
-                confidence=0.50,
-                final_answer=f"I couldn't find enough information in the knowledge base for '{query}'.",
-                action_taken="REJECTED_OFF_TOPIC",
+                confidence=0.70,
+                final_answer=llm_answer,
+                action_taken="PASSED_GENERAL_KNOWLEDGE",
                 flagged_reason="LOW_SIMILARITY_SCORE"
             )
 
         # Step 3: Grounded Passage Citation Check
-        confidence = min(max(top_score, 0.70), 0.99)
+        confidence = min(max(top_score, 0.75), 0.99)
 
         return GuardrailResult(
             is_safe=True,

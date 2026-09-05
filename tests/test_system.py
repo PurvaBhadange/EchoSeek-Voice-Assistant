@@ -109,11 +109,45 @@ def test_short_invalid_input(setup_rag_system):
     assert out.confidence == 0.0
     assert out.error_message is not None
 
+def build_rag_system_for_manual_test():
+    data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../data"))
+    embeddings_file = os.path.join(data_dir, "embeddings/embeddings.npy")
+    chunks_file = os.path.join(data_dir, "embeddings/chunks.json")
+
+    assert os.path.exists(embeddings_file), "Embeddings file missing."
+    assert os.path.exists(chunks_file), "Chunks metadata file missing."
+
+    embeddings_matrix = np.load(embeddings_file)
+    with open(chunks_file, "r", encoding="utf-8") as f:
+        chunks = [Chunk(**c) for c in json.load(f)]
+
+    vector_store = FAISSVectorStore(dimension=384)
+    vector_store.build_index(embeddings_matrix, chunks)
+
+    embedding_engine = EmbeddingEngine("intfloat/multilingual-e5-small")
+    stt_service = SarvamSTTService()
+    llm_service = GeminiLLMService()
+    guardrails = GuardrailsEngine(min_similarity_threshold=0.65)
+
+    harness = RAGModelHarness(
+        embedding_engine=embedding_engine,
+        vector_store=vector_store,
+        stt_service=stt_service,
+        llm_service=llm_service
+    )
+
+    return {
+        "harness": harness,
+        "guardrails": guardrails,
+        "vector_store": vector_store,
+        "embedding_engine": embedding_engine
+    }
+
 def run_tests_manually():
     print("=" * 75)
     print("RUNNING AUTOMATED SYSTEM TEST SUITE")
     print("=" * 75)
-    sys_obj = setup_rag_system()
+    sys_obj = build_rag_system_for_manual_test()
     
     print("[*] Running Test 1: Normal Factual Query...")
     test_normal_factual_query(sys_obj)

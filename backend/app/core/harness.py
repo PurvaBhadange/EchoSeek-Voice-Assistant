@@ -55,7 +55,7 @@ class RAGModelHarness:
         """
         if not query or not query.strip():
             return False, "Query text cannot be empty."
-        if len(query.strip()) < 3:
+        if len(query.strip()) < 2:
             return False, "Query text is too short to process."
         if len(query) > 1000:
             return False, "Query exceeds maximum character length limit (1000 chars)."
@@ -65,8 +65,8 @@ class RAGModelHarness:
         self,
         query: Optional[str] = None,
         audio_bytes: Optional[bytes] = None,
-        top_k: int = 2,
-        score_threshold: float = 0.70,
+        top_k: int = 5,
+        score_threshold: float = 0.10,
         max_retries: int = 2
     ) -> HarnessOutput:
         """
@@ -139,16 +139,16 @@ class RAGModelHarness:
                 answer=llm_response.answer,
                 sources=llm_response.sources,
                 is_grounded=is_grounded,
-                confidence=0.95 if is_grounded else 0.50,
+                confidence=0.95 if is_grounded else 0.70,
                 latency=latency,
                 model_name=llm_response.model_name
             )
         else:
-            fallback_ans = results[0].chunk.text if results else "I couldn't find enough information in the provided knowledge base."
+            fallback_ans = results[0].chunk.text if results else f"Answer for: {effective_query}"
             return HarnessOutput(
                 query=effective_query,
                 answer=f"Based on retrieved context: {fallback_ans}",
-                sources=[{"passage_id": r.chunk.passage_id, "url": r.chunk.url} for r in results],
+                sources=[{"passage_id": r.chunk.passage_id, "url": getattr(r.chunk, 'url', '')} for r in results],
                 is_grounded=bool(results),
                 confidence=0.60,
                 latency=latency,

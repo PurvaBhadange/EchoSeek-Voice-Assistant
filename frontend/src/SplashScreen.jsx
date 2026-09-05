@@ -81,10 +81,11 @@ export default function SplashScreen({ onComplete }) {
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.15em',
-          color: '#DFE104',
-          backgroundColor: '#09090B',
+          color: '#4F8CFC',
+          backgroundColor: '#000000',
           padding: '0.5rem 1rem',
-          border: '2px solid #DFE104'
+          border: '2px solid #7636F6',
+          boxShadow: '0 0 20px rgba(118, 54, 246, 0.5), 0 0 10px rgba(75, 32, 255, 0.3)'
         }}>
           EchoSeek — Kinetic Intelligence // Click Anywhere to Skip
         </div>

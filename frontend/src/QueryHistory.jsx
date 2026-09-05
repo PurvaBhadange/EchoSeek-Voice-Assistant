@@ -58,7 +58,7 @@ export default function QueryHistory() {
 
       {loading ? (
         <div className="kinetic-card" style={{ textAlign: 'center', padding: '4rem' }}>
-          <RefreshCw size={32} className="spin-icon" color="var(--accent-yellow)" style={{ marginBottom: '1rem' }} />
+          <RefreshCw size={32} className="spin-icon" color="var(--accent-blue)" style={{ marginBottom: '1rem' }} />
           <div className="kinetic-label">LOADING AUDIT LOGS...</div>
         </div>
       ) : historyData.length === 0 ? (
@@ -73,13 +73,13 @@ export default function QueryHistory() {
             <div key={item.id || idx} className="kinetic-card kinetic-card-hover" style={{ padding: '1.5rem 2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <span className="kinetic-label" style={{ backgroundColor: 'var(--accent-yellow)', color: '#000', padding: '0.2rem 0.6rem' }}>
+                  <span className="kinetic-label" style={{ backgroundColor: 'var(--accent-blue)', color: '#000', padding: '0.2rem 0.6rem' }}>
                     {item.type === 'voice' ? 'VOICE' : 'TEXT'}
                   </span>
                   <span className="kinetic-label">{item.timestamp}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <span className="kinetic-label" style={{ color: item.is_grounded ? 'var(--accent-yellow)' : '#ff3344' }}>
+                  <span className="kinetic-label" style={{ color: item.is_grounded ? 'var(--accent-blue)' : '#ff3344' }}>
                     {item.is_grounded ? '✓ GROUNDED' : '⚠️ UNVERIFIED'}
                   </span>
                   <span className="kinetic-label" style={{ border: '1px solid var(--border-zinc)', padding: '0.2rem 0.6rem' }}>

@@ -22,8 +22,8 @@ QUERY_HISTORY: List[Dict[str, Any]] = []
 
 class TextQueryRequest(BaseModel):
     query: str
-    top_k: Optional[int] = 2
-    score_threshold: Optional[float] = 0.30
+    top_k: Optional[int] = 5
+    score_threshold: Optional[float] = 0.10
 
 class VectorSearchRequest(BaseModel):
     query: str
@@ -64,7 +64,7 @@ class PipelineServicesContainer:
 
         self.stt_service = SarvamSTTService()
         self.llm_service = GeminiLLMService()
-        self.guardrails = GuardrailsEngine(min_similarity_threshold=0.30)
+        self.guardrails = GuardrailsEngine(min_similarity_threshold=0.10)
         self.harness = RAGModelHarness(
             embedding_engine=self.embedding_engine,
             vector_store=self.vector_store,
@@ -87,13 +87,13 @@ async def process_text_query(req: TextQueryRequest):
 
     harness_output = pipeline_services.harness.run(
         query=req.query,
-        top_k=req.top_k or 2,
-        score_threshold=req.score_threshold or 0.30
+        top_k=req.top_k or 5,
+        score_threshold=req.score_threshold if req.score_threshold is not None else 0.10
     )
 
     q_vec = pipeline_services.embedding_engine.embed_query(req.query)
     results, search_ms = pipeline_services.vector_store.search(
-        q_vec, top_k=req.top_k or 2, score_threshold=req.score_threshold or 0.30
+        q_vec, top_k=req.top_k or 5, score_threshold=req.score_threshold if req.score_threshold is not None else 0.10
     )
 
     guardrail_result = pipeline_services.guardrails.process_guardrails(

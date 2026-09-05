@@ -74,7 +74,7 @@ export default function VectorExplorer({ settings }) {
                 max="10"
                 value={topK}
                 onChange={(e) => setTopK(e.target.value)}
-                style={{ width: '100%', accentColor: 'var(--accent-yellow)', marginTop: '0.5rem' }}
+                style={{ width: '100%', accentColor: 'var(--accent-blue)', marginTop: '0.5rem' }}
               />
             </div>
 
@@ -87,7 +87,7 @@ export default function VectorExplorer({ settings }) {
                 step="0.05"
                 value={threshold}
                 onChange={(e) => setThreshold(e.target.value)}
-                style={{ width: '100%', accentColor: 'var(--accent-yellow)', marginTop: '0.5rem' }}
+                style={{ width: '100%', accentColor: 'var(--accent-blue)', marginTop: '0.5rem' }}
               />
             </div>
 
@@ -108,9 +108,9 @@ export default function VectorExplorer({ settings }) {
       {searchResult && (
         <div>
           <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem', backgroundColor: 'var(--muted-bg)', padding: '1rem 2rem', textTransform: 'uppercase', fontWeight: 700 }}>
-            <span>QUERY: <strong style={{ color: 'var(--accent-yellow)' }}>"{searchResult.query}"</strong></span>
-            <span>HITS: <strong style={{ color: 'var(--accent-yellow)' }}>{searchResult.total_hits}</strong></span>
-            <span>LATENCY: <strong style={{ color: 'var(--accent-yellow)' }}>{searchResult.search_latency_ms} MS</strong></span>
+            <span>QUERY: <strong style={{ color: 'var(--accent-blue)' }}>"{searchResult.query}"</strong></span>
+            <span>HITS: <strong style={{ color: 'var(--accent-blue)' }}>{searchResult.total_hits}</strong></span>
+            <span>LATENCY: <strong style={{ color: 'var(--accent-blue)' }}>{searchResult.search_latency_ms} MS</strong></span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
@@ -123,7 +123,7 @@ export default function VectorExplorer({ settings }) {
                 <div key={hit.rank} className="kinetic-card kinetic-card-hover">
                   <div className="kinetic-num-bg">0{hit.rank}</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                    <span className="kinetic-label" style={{ color: 'var(--accent-yellow)' }}>RANK #{hit.rank}</span>
+                    <span className="kinetic-label" style={{ color: 'var(--accent-blue)' }}>RANK #{hit.rank}</span>
                     <span className="kinetic-label">SCORE: {(hit.score * 100).toFixed(1)}%</span>
                   </div>
                   <p className="kinetic-card-desc" style={{ marginBottom: '1.5rem' }}>

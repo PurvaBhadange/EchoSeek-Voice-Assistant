@@ -31,10 +31,11 @@ export default function AudioVisualizer({ stream, isRecording }) {
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * canvas.height * 0.85;
         
-        // Gradient from cyan to purple
+        // Gradient from vivid blue to bright purple & purple magenta
         const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-        gradient.addColorStop(0, '#00f2fe');
-        gradient.addColorStop(1, '#4facfe');
+        gradient.addColorStop(0, '#3253F8');
+        gradient.addColorStop(0.5, '#7636F6');
+        gradient.addColorStop(1, '#9541E6');
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
