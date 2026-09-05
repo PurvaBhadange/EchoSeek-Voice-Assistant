@@ -25,11 +25,11 @@ app.include_router(pipeline_router)
 import asyncio
 
 @app.on_event("startup")
-async def startup_prewarm_event():
-    print("[*] FastAPI Server Startup: Initializing async prewarm...")
+async def startup_event():
+    print("[*] FastAPI Server Startup: Initializing services...")
     if pipeline_services.embedding_engine is None:
-        asyncio.create_task(asyncio.to_thread(pipeline_services.initialize))
-    print("[+] FastAPI Server port binding ready!")
+        pipeline_services.initialize()
+    print("[+] FastAPI Server ready for requests!")
 
 @app.get("/")
 async def root():
